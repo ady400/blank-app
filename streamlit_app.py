@@ -2,6 +2,7 @@ import time
 import numpy as np
 import pandas as pd
 import streamlit as st
+import io
 from fpdf import FPDF
 from io import BytesIO
 import plotly.io as pio
