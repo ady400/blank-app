@@ -5,6 +5,7 @@ import streamlit as st
 from fpdf import FPDF
 from io import BytesIO
 import plotly.io as pio
+import plotly.graph_objects as go
 
 # Konfigurasi halaman
 st.set_page_config(page_title="Limbah Industri", page_icon="♻️", layout="wide")
