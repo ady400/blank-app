@@ -7,6 +7,30 @@ from fpdf import FPDF
 from io import BytesIO
 import plotly.io as pio
 import plotly.graph_objects as go
+import tempfile
+
+# buat grafik
+fig = go.Figure(data=[go.Pie(labels=["COD", "Sisa"], values=[hasil, max(1000 - hasil, 0)], hole=0.5)])
+fig.update_layout(width=400, height=300)
+
+# simpan grafik sebagai PNG ke file sementara
+with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:
+    fig.write_image(tmpfile.name)
+    image_path = tmpfile.name
+
+# buat PDF dan masukkan teks & grafik
+pdf = FPDF()
+pdf.add_page()
+pdf.set_font("Arial", size=12)
+pdf.multi_cell(0, 10, f"Hasil Uji COD\nVolume titran: {v} mL\nNormalitas: {n} N\nVolume sampel: {vs} mL\n=> COD = {hasil:.2f} mg/L")
+pdf.image(image_path, x=30, y=pdf.get_y() + 10, w=150)  # sesuaikan posisi jika perlu
+
+# simpan PDF ke memory untuk download
+pdf_buffer = io.BytesIO()
+pdf.output(pdf_buffer)
+pdf_buffer.seek(0)
+
+st.download_button("📄 Unduh Hasil (PDF)", pdf_buffer, file_name="hasil_uji_cod.pdf", mime="application/pdf")
 
 # Konfigurasi halaman
 st.set_page_config(page_title="Limbah Industri", page_icon="♻️", layout="wide")
