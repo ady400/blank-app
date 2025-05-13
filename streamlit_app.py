@@ -2,6 +2,8 @@ import streamlit as st
 import plotly.express as px
 from streamlit_lottie import st_lottie
 import requests
+import time
+import io
 
 # ------ SETTING HALAMAN ------
 st.set_page_config(page_title="🧮Kalkulator Sampah", layout="wide")
