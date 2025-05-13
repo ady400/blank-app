@@ -183,7 +183,7 @@ else:
 
 
 # ------ TENTANG ------
-    elif menu == "ℹ️ Tentang":
+elif menu == "ℹ️ Tentang":
         st_lottie(lottie_tentang, speed=1, loop=True, quality="high", height=150)
         st.markdown("<div style='margin-top: 30px'></div>", unsafe_allow_html=True)
         st.title("ℹ️ Tentang Aplikasi")
