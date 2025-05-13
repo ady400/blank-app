@@ -169,7 +169,7 @@ elif menu == "🧮 Kalkulator":
     
 
     # TIPS - hanya tampil jika total sampah > 0
-    if total_manual > 0:
+    elif total_manual > 0:
         st.markdown("### Tips dari Sampahmu")
         if organik_input > anorganik_input:
             st.success("Kamu bisa mulai membuat kompos dari sampah organik.")
