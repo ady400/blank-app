@@ -168,7 +168,7 @@ elif menu == "🧮 Kalkulator":
 
     
 
-    # TIPS - hanya tampil jika total sampah > 0
+# TIPS - hanya tampil jika total sampah > 0
 elif total_manual > 0:
         st.markdown("### Tips dari Sampahmu")
         if organik_input > anorganik_input:
