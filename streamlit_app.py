@@ -137,7 +137,7 @@ elif menu == "🧮 Kalkulator":
             st.info("Kurangi plastik dan belanja bijak.")
         if b3 > 0.1:
             st.warning("Pisahkan limbah B3 seperti baterai!")
-    if submitted:
+        if submitted:
             total_manual = round(organik_input + anorganik_input + b3_input, 2)
         
             col1, col2 = st.columns(2)
