@@ -157,7 +157,7 @@ elif menu == "🧮 Kalkulator":
             with col2:
                 st.metric("Sampah per Orang", f"{total_manual / people:.2f} kg")
 
-           if submitted:
+    if submitted:
     total_manual = round(organik_input + anorganik_input + b3_input, 2)
     ...
 
