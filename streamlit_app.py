@@ -174,3 +174,21 @@ elif menu == "🧮 Kalkulator":
                 st.info("Kurangi plastik, gunakan ulang barang jika bisa.")
             if b3_input > 0.1:
                 st.warning("Pisahkan limbah B3 seperti baterai atau elektronik kecil!")
+
+# ------ TENTANG ------
+elif menu == "ℹ️ Tentang":
+    st_lottie(lottie_tentang, speed=1, loop=True, quality="high", height=150)
+    st.markdown("<div style='margin-top: 30px'></div>", unsafe_allow_html=True)
+    st.title("ℹ️ Tentang Aplikasi")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("""
+        Aplikasi ini dirancang untuk:
+        - Mengedukasi tentang sampah harian rumah tangga  
+        - Menyediakan tips pengurangan limbah  
+        - Mendorong gaya hidup berkelanjutan  
+
+        **Dibuat oleh:** Kelompok 5-PLI AKA
+        
+        **Teknologi:** Streamlit + Plotly + Lottie  
+        """)
