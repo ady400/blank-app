@@ -177,8 +177,8 @@ elif total_manual > 0:
             st.info("Kurangi plastik, gunakan ulang barang jika bisa.")
         if b3_input > 0.1:
             st.warning("Pisahkan limbah B3 seperti baterai atau elektronik kecil!")
-    else:
-        st.info("Masukkan jumlah sampah untuk mendapatkan tips.")
+else:
+    st.info("Masukkan jumlah sampah untuk mendapatkan tips.")
 
 
 
