@@ -158,8 +158,8 @@ elif menu == "🧮 Kalkulator":
                 st.metric("Sampah per Orang", f"{total_manual / people:.2f} kg")
 
     if submitted:
-    total_manual = round(organik_input + anorganik_input + b3_input, 2)
-    ...
+        total_manual = round(organik_input + anorganik_input + b3_input, 2)
+        ...
 
     # Grafik pie chart di sini
 
