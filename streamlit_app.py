@@ -155,7 +155,7 @@ elif menu == "🧮 Kalkulator":
             with col2:
                 if people > 0:
                     st.metric("Sampah per Orang", f"{total_manual / people:.2f} kg")
-                if:
+                else:
                     st.metric("Sampah per Orang", "N/A (Division by zero)")
         
             fig_manual = px.pie(
