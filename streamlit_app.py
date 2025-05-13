@@ -142,11 +142,11 @@ elif menu == "🧮 Kalkulator":
         st.subheader("✍️ Input Manual Sampah")
         people = st.slider("Jumlah orang di rumah", 1, 10, 3)
         with st.form("sampah_input_form"):
-            organik_input = st.number_input("Sampah Organik", min_value=0.0, step=0.1, value=0.0)
-            anorganik_input = st.number_input("Sampah Anorganik", min_value=0.0, step=0.1, value=0.0)
-            b3_input = st.number_input("Sampah B3 (Bahan Berbahaya & Beracun)", min_value=0.0, step=0.1, value=0.0)
+            st.markdown("Masukkan berat sampah yang kamu buang hari ini dalam **kilogram (kg)**.")
+            organik_input = st.number_input("Sampah Organik (kg)", min_value=0.0, step=0.1, value=0.0, format="%.2f")
+            anorganik_input = st.number_input("Sampah Anorganik (kg)", min_value=0.0, step=0.1, value=0.0, format="%.2f")
+            b3_input = st.number_input("Sampah B3 / Limbah Berbahaya (kg)", min_value=0.0, step=0.1, value=0.0, format="%.2f")
             submitted = st.form_submit_button("Hitung dari Input")
-
         if submitted:
             total_manual = round(organik_input + anorganik_input + b3_input, 2)
             st.markdown("## 🔍 Hasil Input Manual")
