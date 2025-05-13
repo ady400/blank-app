@@ -1,3 +1,10 @@
+import time
+import numpy as np
+import pandas as pd
+import streamlit as st
+import io
+from streamlit_lottie import st_lottie
+
 # ------ KALKULATOR ------
 elif menu == "🧮 Kalkulator":
     st_lottie(lottie_kalkulator, speed=1, loop=True, quality="high", height=200)
