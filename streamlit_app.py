@@ -2,11 +2,8 @@ import time
 import numpy as np
 import pandas as pd
 import streamlit as st
-import io
-from streamlit_lottie import st_lottie
 
 # ------ KALKULATOR ------
-    st_lottie(lottie_kalkulator, speed=1, loop=True, quality="high", height=200)
     st.markdown("<div style='margin-top: 30px'></div>", unsafe_allow_html=True)
     st.title("🧮 Hitung Sampah Harianmu")
     st.write("Pilih metode perhitungan sampah harian:")
