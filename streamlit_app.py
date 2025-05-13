@@ -173,15 +173,15 @@ st.markdown("### Tips dari Sampahmu")
 
 if organik_input > anorganik_input:
         st.success("Kamu bisa mulai membuat kompos dari sampah organik.")
-    else:
+else:
         st.info("Sampah organikmu bisa diolah, pertimbangkan membuat kompos.")
 
-    if anorganik_input > 1:
+if anorganik_input > 1:
         st.info("Kurangi plastik, gunakan ulang barang jika bisa.")
-    else:
+else:
         st.success("Sampah anorganikmu masih tergolong rendah, bagus!")
 
-    if b3_input > 0.1:
+if b3_input > 0.1:
         st.warning("Pisahkan limbah B3 seperti baterai atau elektronik kecil!")
-    else:
+else:
         st.info("Sampah B3 sangat sedikit atau tidak ada, pertahankan!")
