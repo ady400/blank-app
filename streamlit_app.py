@@ -98,14 +98,13 @@ elif menu == "🧮 Kalkulator":
     st_lottie(lottie_kalkulator, speed=1, loop=True, quality="high", height=200)
     st.markdown("<div style='margin-top: 30px'></div>", unsafe_allow_html=True)
     st.title("🧮 Hitung Sampah Harianmu")
-    st.write("Pilih metode perhitungan sampah harian:")
 
-    mode = st.radio("Mode Kalkulasi", ["Otomatis", "Input Manual"])
+    mode = st.radio("Pilih Metode Perhitungan:", ["Otomatis", "Input Manual"])
 
     if mode == "Otomatis":
-        st.subheader("📊 Estimasi Berdasarkan Aktivitas")
+        st.write("Masukkan jumlah orang & aktivitas harian:")
         people = st.slider("Jumlah orang di rumah", 1, 10, 3)
-        activity = st.radio("Tingkat aktivitas harian", ["Normal", "Aktif", "Banyak belanja"])
+        activity = st.selectbox("Tingkat aktivitas harian", ["Normal", "Aktif", "Banyak belanja"])
 
         base_waste = 0.7
         if activity == "Aktif":
@@ -140,38 +139,38 @@ elif menu == "🧮 Kalkulator":
         if b3 > 0.1:
             st.warning("Pisahkan limbah B3 seperti baterai!")
 
-else:
-    st.subheader("✍️ Input Manual Sampah")
-    people = st.slider("Jumlah orang di rumah", 1, 10, 3)
+    else:
+        st.subheader("✍️ Input Manual Sampah")
+        people = st.slider("Jumlah orang di rumah", 1, 10, 3)
 
-    with st.form("sampah_input_form"):
-        st.markdown("Masukkan berat sampah harian dalam satuan **kilogram (kg)**.")
-        organik_input = st.number_input("Sampah Organik (kg)", min_value=0.0, step=0.1, value=0.0)
-        anorganik_input = st.number_input("Sampah Anorganik (kg)", min_value=0.0, step=0.1, value=0.0)
-        b3_input = st.number_input("Sampah B3 / Limbah Berbahaya (kg)", min_value=0.0, step=0.1, value=0.0)
-        submitted = st.form_submit_button("Hitung dari Input")
+        with st.form("sampah_input_form"):
+            st.markdown("Masukkan berat sampah harian dalam satuan **kilogram (kg)**.")
+            organik_input = st.number_input("Sampah Organik (kg)", min_value=0.0, step=0.1)
+            anorganik_input = st.number_input("Sampah Anorganik (kg)", min_value=0.0, step=0.1)
+            b3_input = st.number_input("Sampah B3 / Limbah Berbahaya (kg)", min_value=0.0, step=0.1)
+            submitted = st.form_submit_button("Hitung dari Input")
 
-    if submitted:
-        total_manual = round(organik_input + anorganik_input + b3_input, 2)
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Total Sampah", f"{total_manual} kg")
-        with col2:
-            st.metric("Sampah per Orang", f"{total_manual / people:.2f} kg")
+        if submitted:
+            total_manual = round(organik_input + anorganik_input + b3_input, 2)
 
-        fig_manual = px.pie(
-            names=["Organik", "Anorganik", "B3"],
-            values=[organik_input, anorganik_input, b3_input],
-            color_discrete_sequence=['#AED581', '#4FC3F7', '#FF8A65'],
-            title="Komposisi Sampah dari Input"
-        )
-        st.plotly_chart(fig_manual, use_container_width=True)
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("Total Sampah", f"{total_manual} kg")
+            with col2:
+                st.metric("Sampah per Orang", f"{total_manual / people:.2f} kg")
 
-# Tips
-st.markdown("### Tips dari Sampahmu")
-if organik_input > anorganik_input:
-    st.success("Kamu bisa mulai membuat kompos dari sampah organik.")
-if anorganik_input > 1:
-    st.info("Kurangi plastik, gunakan ulang barang jika bisa.")
-if b3_input > 0.1:
-    st.warning("Pisahkan limbah B3 seperti baterai atau elektronik kecil!")
+            fig_manual = px.pie(
+                names=["Organik", "Anorganik", "B3"],
+                values=[organik_input, anorganik_input, b3_input],
+                color_discrete_sequence=['#AED581', '#4FC3F7', '#FF8A65'],
+                title="Komposisi Sampah dari Input"
+            )
+            st.plotly_chart(fig_manual, use_container_width=True)
+
+            st.markdown("### Tips dari Sampahmu")
+            if organik_input > anorganik_input:
+                st.success("Kamu bisa mulai membuat kompos dari sampah organik.")
+            if anorganik_input > 1:
+                st.info("Kurangi plastik, gunakan ulang barang jika bisa.")
+            if b3_input > 0.1:
+                st.warning("Pisahkan limbah B3 seperti baterai atau elektronik kecil!")
