@@ -157,21 +157,23 @@ elif menu == "🧮 Kalkulator":
             with col2:
                 st.metric("Sampah per Orang", f"{total_manual / people:.2f} kg")
 
-            fig_manual = px.pie(
-                names=["Organik", "Anorganik", "B3"],
-                values=[organik_input, anorganik_input, b3_input],
-                color_discrete_sequence=['#AED581', '#4FC3F7', '#FF8A65'],
-                title="Komposisi Sampah dari Input"
-            )
-            st.plotly_chart(fig_manual, use_container_width=True)
+           if submitted:
+    total_manual = round(organik_input + anorganik_input + b3_input, 2)
+    ...
 
-            st.markdown("### Tips dari Sampahmu")
-            if organik_input > anorganik_input:
-                st.success("Kamu bisa mulai membuat kompos dari sampah organik.")
-            if anorganik_input > 1:
-                st.info("Kurangi plastik, gunakan ulang barang jika bisa.")
-            if b3_input > 0.1:
-                st.warning("Pisahkan limbah B3 seperti baterai atau elektronik kecil!")
+    # Grafik pie chart di sini
+
+    if total_manual > 0:
+        st.markdown("### Tips dari Sampahmu")
+        if organik_input > anorganik_input:
+            st.success("Kamu bisa mulai membuat kompos dari sampah organik.")
+        if anorganik_input > 1:
+            st.info("Kurangi plastik, gunakan ulang barang jika bisa.")
+        if b3_input > 0.1:
+            st.warning("Pisahkan limbah B3 seperti baterai atau elektronik kecil!")
+    else:
+        st.info("Masukkan jumlah sampah untuk mendapatkan tips.")
+
 
 
 # ------ TENTANG ------
