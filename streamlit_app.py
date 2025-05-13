@@ -6,7 +6,6 @@ import io
 from streamlit_lottie import st_lottie
 
 # ------ KALKULATOR ------
-elif menu == "🧮 Kalkulator":
     st_lottie(lottie_kalkulator, speed=1, loop=True, quality="high", height=200)
     st.markdown("<div style='margin-top: 30px'></div>", unsafe_allow_html=True)
     st.title("🧮 Hitung Sampah Harianmu")
