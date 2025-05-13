@@ -141,28 +141,30 @@ elif menu == "🧮 Kalkulator":
     else:
         st.subheader("✍️ Input Manual Sampah")
         people = st.slider("Jumlah orang di rumah", 1, 10, 3)
-        with st.form("sampah_input_form"):
-            st.markdown("Masukkan berat sampah yang kamu buang hari ini dalam **kilogram (kg)**.")
-            organik_input = st.number_input("Sampah Organik (kg)", min_value=0.0, step=0.1, value=0.0, format="%.2f")
-            anorganik_input = st.number_input("Sampah Anorganik (kg)", min_value=0.0, step=0.1, value=0.0, format="%.2f")
-            b3_input = st.number_input("Sampah B3 / Limbah Berbahaya (kg)", min_value=0.0, step=0.1, value=0.0, format="%.2f")
-            submitted = st.form_submit_button("Hitung dari Input")
-        if submitted:
-            total_manual = round(organik_input + anorganik_input + b3_input, 2)
-            st.markdown("## 🔍 Hasil Input Manual")
+       with st.form("sampah_input_form"):
+    organik_input = st.number_input("Sampah Organik (kg)", min_value=0.0, step=0.1, value=0.0)
+    anorganik_input = st.number_input("Sampah Anorganik (kg)", min_value=0.0, step=0.1, value=0.0)
+    b3_input = st.number_input("Sampah B3 (kg)", min_value=0.0, step=0.1, value=0.0)
+    submitted = st.form_submit_button("Hitung dari Input")
 
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric("Total Sampah", f"{total_manual} kg")
-            with col2:
-                st.metric("Sampah per Orang", f"{total_manual / people:.2f} kg")
+if submitted:
+    total_manual = round(organik_input + anorganik_input + b3_input, 2)
 
-    if submitted:
-        total_manual = round(organik_input + anorganik_input + b3_input, 2)
-        ...
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Total Sampah", f"{total_manual} kg")
+    with col2:
+        st.metric("Sampah per Orang", f"{total_manual / people:.2f} kg")
 
-    # Grafik pie chart di sini
+    fig_manual = px.pie(
+        names=["Organik", "Anorganik", "B3"],
+        values=[organik_input, anorganik_input, b3_input],
+        color_discrete_sequence=['#AED581', '#4FC3F7', '#FF8A65'],
+        title="Komposisi Sampah dari Input"
+    )
+    st.plotly_chart(fig_manual, use_container_width=True)
 
+    # Tips aman diletakkan DI SINI
     if total_manual > 0:
         st.markdown("### Tips dari Sampahmu")
         if organik_input > anorganik_input:
@@ -171,8 +173,6 @@ elif menu == "🧮 Kalkulator":
             st.info("Kurangi plastik, gunakan ulang barang jika bisa.")
         if b3_input > 0.1:
             st.warning("Pisahkan limbah B3 seperti baterai atau elektronik kecil!")
-    else:
-        st.info("Masukkan jumlah sampah untuk mendapatkan tips.")
 
 
 
