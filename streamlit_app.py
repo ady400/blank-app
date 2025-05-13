@@ -137,21 +137,7 @@ elif menu == "🧮 Kalkulator":
             st.info("Kurangi plastik dan belanja bijak.")
         if b3 > 0.1:
             st.warning("Pisahkan limbah B3 seperti baterai!")
-    if submitted:
-        total_manual = round(organik_input + anorganik_input + b3_input, 2)
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Total Sampah", f"{total_manual} kg")
-        with col2:
-            st.metric("Sampah per Orang", f"{total_manual / people:.2f} kg")
-        
-        fig_manual = px.pie(
-            names=["Organik", "Anorganik", "B3"],
-            values=[organik_input, anorganik_input, b3_input],
-            color_discrete_sequence=['#AED581', '#4FC3F7', '#FF8A65'],
-            title="Komposisi Sampah dari Input"
-            )
-            st.plotly_chart(fig_manual, use_container_width=True)
+    
     else:
         st.subheader("✍️ Input Manual Sampah")
         people = st.slider("Jumlah orang di rumah", 1, 10, 3)
@@ -161,6 +147,24 @@ elif menu == "🧮 Kalkulator":
             anorganik_input = st.number_input("Sampah Anorganik (kg)", min_value=0.0, step=0.1, value=0.0)
             b3_input = st.number_input("Sampah B3 / Limbah Berbahaya (kg)", min_value=0.0, step=0.1, value=0.0)
             submitted = st.form_submit_button("Hitung dari Input")
+        if submitted:
+            total_manual = round(organik_input + anorganik_input + b3_input, 2)
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("Total Sampah", f"{total_manual} kg")
+            with col2:
+                if people > 0:
+                    st.metric("Sampah per Orang", f"{total_manual / people:.2f} kg")
+                else:
+                    st.metric("Sampah per Orang", "N/A (Division by zero)")
+        
+            fig_manual = px.pie(
+                names=["Organik", "Anorganik", "B3"],
+                values=[organik_input, anorganik_input, b3_input],
+                color_discrete_sequence=['#AED581', '#4FC3F7', '#FF8A65'],
+                title="Komposisi Sampah dari Input"
+            )
+            st.plotly_chart(fig_manual, use_container_width=True)
 
     
 
