@@ -164,8 +164,8 @@ if submitted:
     )
     st.plotly_chart(fig_manual, use_container_width=True)
 
-    # Tips aman diletakkan DI SINI
-    if total_manual > 0:
+# Tips aman diletakkan DI SINI
+if total_manual > 0:
         st.markdown("### Tips dari Sampahmu")
         if organik_input > anorganik_input:
             st.success("Kamu bisa mulai membuat kompos dari sampah organik.")
