@@ -147,40 +147,39 @@ elif menu == "🧮 Kalkulator":
             anorganik_input = st.number_input("Sampah Anorganik (kg)", min_value=0.0, step=0.1, value=0.0)
             b3_input = st.number_input("Sampah B3 / Limbah Berbahaya (kg)", min_value=0.0, step=0.1, value=0.0)
             submitted = st.form_submit_button("Hitung dari Input")
-        if submitted:
-            total_manual = round(organik_input + anorganik_input + b3_input, 2)
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric("Total Sampah", f"{total_manual} kg")
-            with col2:
-                if people > 0:
-                    st.metric("Sampah per Orang", f"{total_manual / people:.2f} kg")
-                else:
-                    st.metric("Sampah per Orang", "N/A (Division by zero)")
-        
-            fig_manual = px.pie(
-                names=["Organik", "Anorganik", "B3"],
-                values=[organik_input, anorganik_input, b3_input],
-                color_discrete_sequence=['#AED581', '#4FC3F7', '#FF8A65'],
-                title="Komposisi Sampah dari Input"
-            )
-            st.plotly_chart(fig_manual, use_container_width=True)
-
+    if submitted:
+        total_manual = round(organik_input + anorganik_input + b3_input, 2)
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Total Sampah", f"{total_manual} kg")
+        with col2:
+            if people > 0:
+                st.metric("Sampah per Orang", f"{total_manual / people:.2f} kg")
+            else:
+                st.metric("Sampah per Orang", "N/A (Division by zero)")
     
+        fig_manual = px.pie(
+            names=["Organik", "Anorganik", "B3"],
+            values=[organik_input, anorganik_input, b3_input],
+            color_discrete_sequence=['#AED581', '#4FC3F7', '#FF8A65'],
+            title="Komposisi Sampah dari Input"
+        )
+        st.plotly_chart(fig_manual, use_container_width=True)
 
-# TIPS - hanya tampil jika total sampah > 1
-elif total_manual > 1:
-        st.markdown("### Tips dari Sampahmu")
-        if organik_input > anorganik_input:
-            st.success("Kamu bisa mulai membuat kompos dari sampah organik.")
-        if anorganik_input > 1:
-            st.info("Kurangi plastik, gunakan ulang barang jika bisa.")
-        if b3_input > 0.1:
-            st.warning("Pisahkan limbah B3 seperti baterai atau elektronik kecil!")
-else:
-    st.info("Masukkan jumlah sampah untuk mendapatkan tips.")
+    # Tampilkan Tips dari Sampahmu
+    st.markdown("### Tips dari Sampahmu")
 
+    if organik_input > anorganik_input:
+        st.success("Kamu bisa mulai membuat kompos dari sampah organik.")
+    else:
+        st.info("Sampah organikmu bisa diolah, pertimbangkan membuat kompos.")
 
+    if anorganik_input > 1:
+        st.info("Kurangi plastik, gunakan ulang barang jika bisa.")
+    else:
+        st.success("Sampah anorganikmu masih tergolong rendah, bagus!")
 
-
-
+    if b3_input > 0.1:
+        st.warning("Pisahkan limbah B3 seperti baterai atau elektronik kecil!")
+    else:
+        st.info("Sampah B3 sangat sedikit atau tidak ada, pertahankan!")
