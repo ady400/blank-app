@@ -138,7 +138,7 @@ elif menu == "🧮 Kalkulator":
         if b3 > 0.1:
             st.warning("Pisahkan limbah B3 seperti baterai!")
     
-    else:
+    elif:
         st.subheader("✍️ Input Manual Sampah")
         people = st.slider("Jumlah orang di rumah", 1, 10, 3)
         with st.form("sampah_input_form"):
