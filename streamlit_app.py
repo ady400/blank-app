@@ -175,6 +175,7 @@ elif menu == "🧮 Kalkulator":
             if b3_input > 0.1:
                 st.warning("Pisahkan limbah B3 seperti baterai atau elektronik kecil!")
 
+
 # ------ TENTANG ------
 elif menu == "ℹ️ Tentang":
     st_lottie(lottie_tentang, speed=1, loop=True, quality="high", height=150)
