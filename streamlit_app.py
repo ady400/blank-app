@@ -137,20 +137,19 @@ elif menu == "🧮 Kalkulator":
             st.info("Kurangi plastik dan belanja bijak.")
         if b3 > 0.1:
             st.warning("Pisahkan limbah B3 seperti baterai!")
-        if submitted:
-            total_manual = round(organik_input + anorganik_input + b3_input, 2)
+    if submitted:
+        total_manual = round(organik_input + anorganik_input + b3_input, 2)
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Total Sampah", f"{total_manual} kg")
+        with col2:
+            st.metric("Sampah per Orang", f"{total_manual / people:.2f} kg")
         
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric("Total Sampah", f"{total_manual} kg")
-            with col2:
-                st.metric("Sampah per Orang", f"{total_manual / people:.2f} kg")
-        
-            fig_manual = px.pie(
-                names=["Organik", "Anorganik", "B3"],
-                values=[organik_input, anorganik_input, b3_input],
-                color_discrete_sequence=['#AED581', '#4FC3F7', '#FF8A65'],
-                title="Komposisi Sampah dari Input"
+        fig_manual = px.pie(
+            names=["Organik", "Anorganik", "B3"],
+            values=[organik_input, anorganik_input, b3_input],
+            color_discrete_sequence=['#AED581', '#4FC3F7', '#FF8A65'],
+            title="Komposisi Sampah dari Input"
             )
             st.plotly_chart(fig_manual, use_container_width=True)
     else:
