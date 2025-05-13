@@ -141,7 +141,7 @@ elif menu == "🧮 Kalkulator":
     else:
         st.subheader("✍️ Input Manual Sampah")
         people = st.slider("Jumlah orang di rumah", 1, 10, 3)
-       with st.form("sampah_input_form"):
+           with st.form("sampah_input_form"):
             organik_input = st.number_input("Sampah Organik (kg)", min_value=0.0, step=0.1, value=0.0)
             anorganik_input = st.number_input("Sampah Anorganik (kg)", min_value=0.0, step=0.1, value=0.0)
             b3_input = st.number_input("Sampah B3 (kg)", min_value=0.0, step=0.1, value=0.0)
