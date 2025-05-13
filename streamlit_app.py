@@ -167,11 +167,11 @@ else:
         )
         st.plotly_chart(fig_manual, use_container_width=True)
 
-        # Tips
-        st.markdown("### Tips dari Sampahmu")
-        if organik_input > anorganik_input:
-            st.success("Kamu bisa mulai membuat kompos dari sampah organik.")
-        if anorganik_input > 1:
-            st.info("Kurangi plastik, gunakan ulang barang jika bisa.")
-        if b3_input > 0.1:
-            st.warning("Pisahkan limbah B3 seperti baterai atau elektronik kecil!")
+# Tips
+st.markdown("### Tips dari Sampahmu")
+if organik_input > anorganik_input:
+    st.success("Kamu bisa mulai membuat kompos dari sampah organik.")
+if anorganik_input > 1:
+    st.info("Kurangi plastik, gunakan ulang barang jika bisa.")
+if b3_input > 0.1:
+    st.warning("Pisahkan limbah B3 seperti baterai atau elektronik kecil!")
