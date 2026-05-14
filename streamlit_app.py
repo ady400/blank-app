@@ -231,25 +231,27 @@ elif page == "📊 Simulasi Real-time":
     
     # Plot 4: Regulatory
     status_color = 'green' if BOD_out_sim <= BAKU_MUTU['BOD5'] else 'red'
-    fig_gauge = go.Figure(go.Indicator(
-        mode="gauge+number+delta",
-        value=BOD_out_sim,
-        domain={'x': [0, 1], 'y': [0, 1]},
-        title={'text': "BOD (mg/L)"},
-        delta={'reference': BAKU_MUTU['BOD5']},
-        gauge={
-            'axis': {'range': [None, 100]},
-            'bar': {'color': status_color},
-            'steps': [
-                {'range': [0, 30], 'color': 'green'},
-                {'range': [30, 100], 'color': 'red'}],
-            'threshold': {
-                'line': {'color': "red", 'width': 4},
-                'thickness': 0.75,
-                'value': BAKU_MUTU['BOD5']}
-        }), row=2, col=2)
-    
-    st.plotly_chart(fig, use_container_width=True)
+     fig_gauge = go.Figure(go.Indicator(
+    mode = "gauge+number",
+    value = bod_out,
+    domain = {'x': [0, 1], 'y': [0, 1]},
+    title = {'text': "Kadar BOD Akhir (mg/L)"},
+    gauge = {
+        'axis': {'range': [None, bod_in]},
+        'bar': {'color': "darkblue"},
+        'steps': [
+            {'range': [0, 30], 'color': "lightgreen"}, # Zona Aman
+            {'range': [30, bod_in], 'color': "pink"}    # Zona Bahaya
+        ],
+        'threshold': {
+            'line': {'color': "red", 'width': 4},
+            'thickness': 0.75,
+            'value': 30 # Ambang batas baku mutu
+        }
+    }
+))
+
+st.plotly_chart(fig_gauge, use_container_width=True)
 
 # Halaman 4: Regulatory Checker
 elif page == "✅ Regulatory Checker":
