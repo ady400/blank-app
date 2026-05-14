@@ -231,7 +231,7 @@ elif page == "📊 Simulasi Real-time":
     
     # Plot 4: Regulatory
     status_color = 'green' if BOD_out_sim <= BAKU_MUTU['BOD5'] else 'red'
-    fig.add_trace(go.Indicator(
+    fig_gauge = go.Figure(go.Indicator(
         mode="gauge+number+delta",
         value=BOD_out_sim,
         domain={'x': [0, 1], 'y': [0, 1]},
