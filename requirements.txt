@@ -1,7 +1,19 @@
-streamlit==1.35.0
-pandas==2.2.2
-numpy==1.26.4
-plotly==5.21.0
-requests==2.31.0
-streamlit-lottie==0.0.5
-python3.11
+"""
+EcoEngineer Pro-Dash Requirements
+================================
+"""
+
+streamlit==1.29.0
+pandas==2.1.4
+numpy==1.25.2
+plotly==5.17.0
+python-dotenv==1.0.0
+
+# Optional: untuk deployment
+altair==5.1.5
+pyarrow==14.0.1
+cachetools==5.3.2
+blinker==1.7.0
+click==8.1.7
+rich==13.7.0
+watchdog==3.0.0
