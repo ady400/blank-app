@@ -50,13 +50,13 @@ if page == "🏗️ Unit Sizing":
     
    col1, col2 = st.columns(2)
     
-    with col1:
+   with col1:
         st.subheader("Input Data")
         Q = st.number_input("**Debit (Q)** (m³/hari)", min_value=1.0, value=100.0, step=10.0)
         td = st.number_input("**Waktu Tinggal (t_d)** (jam)", min_value=1.0, value=24.0, step=1.0)
         SLR = st.number_input("**Surface Loading Rate** (m³/m².hari)", min_value=5.0, value=24.0, step=1.0)
     
-    with col2:
+   with col2:
         if st.button("💾 Hitung Dimensi", type="primary"):
             dimensions = calculate_unit_sizing(Q, td, SLR)
             
