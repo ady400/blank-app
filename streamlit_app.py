@@ -47,7 +47,9 @@ page = st.sidebar.selectbox("Pilih Fitur:", ["🏗️ Unit Sizing", "🧪 Stoich
 
 if page == "🏗️ Unit Sizing":
    st.header("🏗️ Automatic Unit Sizing")
+    
    col1, col2 = st.columns(2)
+    
     with col1:
         st.subheader("Input Data")
         Q = st.number_input("**Debit (Q)** (m³/hari)", min_value=1.0, value=100.0, step=10.0)
