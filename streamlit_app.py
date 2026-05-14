@@ -46,34 +46,73 @@ st.markdown('<h1 class="main-header">🌱 EcoEngineer Pro-Dash</h1>', unsafe_all
 page = st.sidebar.selectbox("Pilih Fitur:", ["🏗️ Unit Sizing", "🧪 Stoichiometry", "📊 Simulasi", "✅ Checker"])
 
 if page == "🏗️ Unit Sizing":
-    st.header("🏗️ Automatic Unit Sizing")
+   st.header("🏗️ Automatic Unit Sizing")
+    
     col1, col2 = st.columns(2)
+    
     with col1:
-        Q = st.number_input("Debit (Q) m³/hari", min_value=1.0, value=100.0)
-        td = st.number_input("Waktu Tinggal (jam)", min_value=1.0, value=24.0)
-        SLR = st.number_input("Surface Loading Rate", min_value=5.0, value=24.0)
+        st.subheader("Input Data")
+        Q = st.number_input("**Debit (Q)** (m³/hari)", min_value=1.0, value=100.0, step=10.0)
+        td = st.number_input("**Waktu Tinggal (t_d)** (jam)", min_value=1.0, value=24.0, step=1.0)
+        SLR = st.number_input("**Surface Loading Rate** (m³/m².hari)", min_value=5.0, value=24.0, step=1.0)
+    
     with col2:
-        if st.button("💾 Hitung Dimensi"):
+        if st.button("💾 Hitung Dimensi", type="primary"):
             dimensions = calculate_unit_sizing(Q, td, SLR)
+            
+            st.subheader("📐 Hasil Dimensi Bak")
             col_a, col_b, col_c = st.columns(3)
+            
             with col_a:
-                st.metric("Volume", f"{dimensions['Volume']} m³")
+                st.metric("**Volume**", f"{dimensions['Volume']} m³")
             with col_b:
-                st.metric("Luas", f"{dimensions['Luas']} m²")
+                st.metric("**Luas**", f"{dimensions['Luas']} m²")
             with col_c:
-                st.metric("Dimensi", f"{dimensions['Panjang']}x{dimensions['Lebar']}x{dimensions['Tinggi']}m")
+                st.metric("**P x L x T**", f"{dimensions['Panjang']} x {dimensions['Lebar']} x {dimensions['Tinggi']} m")
+            
+            # Gambar 3D sederhana
+            fig = go.Figure(data=[go.Mesh3d(
+                x=[0, dimensions['Panjang'], dimensions['Panjang'], 0,
+                   0, dimensions['Panjang'], dimensions['Panjang'], 0],
+                y=[0, 0, dimensions['Lebar'], dimensions['Lebar'],
+                   0, 0, dimensions['Lebar'], dimensions['Lebar']],
+                z=[0, 0, 0, 0, dimensions['Tinggi'], dimensions['Tinggi'], 
+                   dimensions['Tinggi'], dimensions['Tinggi']],
+                color='lightblue',
+                opacity=0.7
+            )])
+            fig.update_layout(title="Visualisasi 3D Bak", scene=dict(
+                xaxis_title='Panjang (m)',
+                yaxis_title='Lebar (m)',
+                zaxis_title='Tinggi (m)'
+            ))
+            st.plotly_chart(fig, use_container_width=True)
 
 elif page == "🧪 Stoichiometry":
     st.header("🧪 Stoichiometry Calculator")
+    
     col1, col2 = st.columns(2)
+    
     with col1:
-        BOD_in = st.number_input("BOD Masuk mg/L", value=200.0)
-        Q_stoich = st.number_input("Debit m³/hari", value=100.0)
-        coagulant = st.selectbox("Koagulan", ['FeCl3', 'Alum', 'PAC'])
+        st.subheader("Input Data")
+        BOD_in = st.number_input("**BOD Masuk** (mg/L)", min_value=0.0, value=200.0)
+        Q_stoich = st.number_input("**Debit** (m³/hari)", min_value=1.0, value=100.0)
+        coagulant = st.selectbox("**Jenis Koagulan**", ['FeCl3', 'Alum', 'PAC'])
+    
     with col2:
         dosage = stoichiometry_coagulant(BOD_in, Q_stoich, coagulant)
-        st.metric("Kebutuhan Koagulan", f"{dosage} kg/hari")
-
+        st.metric("**Kebutuhan Koagulan**", f"{dosage} kg/hari")
+        
+        st.info(f"**Rasio**: 1 mg {coagulant} per {8 if coagulant=='FeCl3' else 10 if coagulant=='Alum' else 6} mg BOD")
+    
+    # Tabel rekomendasi
+    st.subheader("📋 Rekomendasi Jar Test")
+    jar_data = {
+        'Koagulan': ['FeCl3', 'Alum', 'PAC'],
+        'Dosis Optimal': ['200-800 mg/L', '300-1000 mg/L', '150-600 mg/L'],
+        'pH Optimal': ['6.5-7.5', '6.0-7.5', '6.5-8.0']
+    }
+    st.table(pd.DataFrame(jar_data))
 elif page == "📊 Simulasi":
     st.header("📊 Interactive Simulation")
     col1, col2, col3 = st.columns(3)
