@@ -2,321 +2,102 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-import plotly.express as px
-from plotly.subplots import make_subplots
-import math
 
-# Konfigurasi halaman
-st.set_page_config(
-    page_title="EcoEngineer Pro-Dash",
-    page_icon="🌱",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# --- KONFIGURASI HALAMAN ---
+st.set_page_config(page_title="EcoEng Simulator IPAL", layout="wide")
 
-# CSS styling
+# --- CUSTOM CSS ---
 st.markdown("""
-<style>
-    .main-header {
-        font-size: 2.5rem;
-        color: #2E7D32;
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-    .metric-card {
-        background-color: #E8F5E8;
-        padding: 1rem;
-        border-radius: 10px;
-        border-left: 5px solid #4CAF50;
-    }
-    .status-pass {
-        color: #4CAF50;
-        font-weight: bold;
-        font-size: 1.2rem;
-    }
-    .status-fail {
-        color: #F44336;
-        font-weight: bold;
-        font-size: 1.2rem;
-    }
-</style>
-""", unsafe_allow_html=True)
+    <style>
+    .main { background-color: #f5f7f9; }
+    .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    </style>
+    """, unsafe_allow_html=True)
 
-# Data Baku Mutu PP No. 22 Tahun 2021 (Domestik)
-BAKU_MUTU = {
-    'BOD5': 30,      # mg/L
-    'COD': 100,      # mg/L
-    'TSS': 30,       # mg/L
-    'pH': (6, 9),    # rentang
-    'NH3-N': 5       # mg/L
-}
+# --- SIDEBAR: INPUT PARAMETER ---
+st.sidebar.header("🛠️ Parameter Input Limbah")
+debit = st.sidebar.number_input("Debit Air Limbah (m³/hari)", min_value=1.0, value=500.0, step=10.0)
+bod_in = st.sidebar.number_input("BOD Inlet (mg/L)", min_value=1.0, value=300.0)
+tss_in = st.sidebar.number_input("TSS Inlet (mg/L)", min_value=1.0, value=250.0)
 
-def calculate_unit_sizing(Q, td, surface_loading_rate=24):
-    """
-    Menghitung dimensi bak pengolahan
-    Q: debit (m³/hari)
-    td: waktu tinggal (jam)
-    surface_loading_rate: m³/m².hari (default 24 untuk bak aerasi)
-    """
-    # Volume bak (m³)
-    V = Q * td / 24
-    
-    # Luas permukaan (m²)
-    A = Q / surface_loading_rate
-    
-    # Dimensi (asumsi H = 3-4m untuk bak aerasi)
-    H = 3.5
-    L = math.sqrt(A * 3)  # Panjang 3x lebar
-    W = math.sqrt(A / 3)
-    
-    return {
-        'Volume': round(V, 2),
-        'Luas': round(A, 2),
-        'Panjang': round(L, 2),
-        'Lebar': round(W, 2),
-        'Tinggi': H
-    }
+st.sidebar.divider()
+st.sidebar.header("⚙️ Konfigurasi Desain")
+hrt_target = st.sidebar.slider("Waktu Tinggal / HRT (Jam)", 1, 48, 24)
+kedalaman_rencana = st.sidebar.slider("Rencana Kedalaman Bak (m)", 1.5, 5.0, 3.0)
 
-def stoichiometry_coagulant(BOD_in, Q, coagulant_type='FeCl3'):
-    """
-    Menghitung kebutuhan koagulan
-    """
-    # Rasio mg koagulan / mg BOD (estimasi jar test)
-    ratios = {
-        'FeCl3': 8,    # mg/mg BOD
-        'Alum': 10,    # mg/mg BOD
-        'PAC': 6       # mg/mg BOD
-    }
-    
-    dosage = BOD_in * ratios.get(coagulant_type, 8) * Q / 1000  # kg/hari
-    return round(dosage, 2)
+# --- LOGIKA PERHITUNGAN TEKNIK ---
+# 1. Perhitungan Volume Bak
+volume_m3 = (debit / 24) * hrt_target
+luas_permukaan = volume_m3 / kedalaman_rencana
 
-def calculate_efficiency(influent, effluent):
-    """Menghitung efisiensi penyisihan (%)"""
-    return ((influent - effluent) / influent * 100) if influent > 0 else 0
+# 2. Estimasi Efisiensi (Sederhana: Kinetika Orde 1)
+# Misal konstanta degradasi k = 0.15 / jam
+k = 0.15
+bod_out = bod_in * np.exp(-k * hrt_target)
+efisiensi = ((bod_in - bod_out) / bod_in) * 100
 
-def check_regulation(effluent):
-    """Cek kepatuhan baku mutu"""
-    status = {}
-    for param, limit in BAKU_MUTU.items():
-        if param == 'pH':
-            status[param] = effluent[param] >= limit[0] and effluent[param] <= limit[1]
-        else:
-            status[param] = effluent[param] <= limit
-    return status
+# --- MAIN CONTENT ---
+st.title("🌊 Digital Twin: Simulator Pengolahan Limbah")
+st.markdown("Alat simulasi presisi untuk perancangan dimensi unit IPAL dan prediksi kualitas outlet.")
 
-# Header
-st.markdown('<h1 class="main-header">🌱 EcoEngineer Pro-Dash</h1>', unsafe_allow_html=True)
-st.markdown("**Dashboard Desain & Monitoring Instalasi Pengolahan Limbah**")
+# Kolom Ringkasan
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Volume Reaktor", f"{volume_m3:.1f} m³")
+col2.metric("Luas Lahan", f"{luas_permukaan:.1f} m²")
+col3.metric("Prediksi BOD Outlet", f"{bod_out:.1f} mg/L")
+col4.metric("Efisiensi Sistem", f"{efisiensi:.1f}%")
 
-# Sidebar untuk navigasi
-st.sidebar.title("📋 Menu")
-page = st.sidebar.selectbox("Pilih Fitur:", [
-    "🏗️ Unit Sizing", 
-    "🧪 Stoichiometry", 
-    "📊 Simulasi Real-time", 
-    "✅ Regulatory Checker"
-])
+st.divider()
 
-# Halaman 1: Automatic Unit Sizing
-if page == "🏗️ Unit Sizing":
-    st.header("🏗️ Automatic Unit Sizing")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader("Input Data")
-        Q = st.number_input("**Debit (Q)** (m³/hari)", min_value=1.0, value=100.0, step=10.0)
-        td = st.number_input("**Waktu Tinggal (t_d)** (jam)", min_value=1.0, value=24.0, step=1.0)
-        SLR = st.number_input("**Surface Loading Rate** (m³/m².hari)", min_value=5.0, value=24.0, step=1.0)
-    
-    with col2:
-        if st.button("💾 Hitung Dimensi", type="primary"):
-            dimensions = calculate_unit_sizing(Q, td, SLR)
-            
-            st.subheader("📐 Hasil Dimensi Bak")
-            col_a, col_b, col_c = st.columns(3)
-            
-            with col_a:
-                st.metric("**Volume**", f"{dimensions['Volume']} m³")
-            with col_b:
-                st.metric("**Luas**", f"{dimensions['Luas']} m²")
-            with col_c:
-                st.metric("**P x L x T**", f"{dimensions['Panjang']} x {dimensions['Lebar']} x {dimensions['Tinggi']} m")
-            
-            # Gambar 3D sederhana
-            fig = go.Figure(data=[go.Mesh3d(
-                x=[0, dimensions['Panjang'], dimensions['Panjang'], 0,
-                   0, dimensions['Panjang'], dimensions['Panjang'], 0],
-                y=[0, 0, dimensions['Lebar'], dimensions['Lebar'],
-                   0, 0, dimensions['Lebar'], dimensions['Lebar']],
-                z=[0, 0, 0, 0, dimensions['Tinggi'], dimensions['Tinggi'], 
-                   dimensions['Tinggi'], dimensions['Tinggi']],
-                color='lightblue',
-                opacity=0.7
-            )])
-            fig.update_layout(title="Visualisasi 3D Bak", scene=dict(
-                xaxis_title='Panjang (m)',
-                yaxis_title='Lebar (m)',
-                zaxis_title='Tinggi (m)'
-            ))
-            st.plotly_chart(fig, use_container_width=True)
+# Tab Area
+tab1, tab2, tab3 = st.tabs(["📊 Analisis Performa", "📐 Dimensi Teknik", "📜 Cek Regulasi"])
 
-# Halaman 2: Stoichiometry Calculator
-elif page == "🧪 Stoichiometry":
-    st.header("🧪 Stoichiometry Calculator")
+with tab1:
+    st.subheader("Simulasi Penurunan Polutan")
+    # Membuat data simulasi degradasi sepanjang waktu
+    waktu_series = np.linspace(0, hrt_target, 100)
+    bod_series = bod_in * np.exp(-k * waktu_series)
     
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader("Input Data")
-        BOD_in = st.number_input("**BOD Masuk** (mg/L)", min_value=0.0, value=200.0)
-        Q_stoich = st.number_input("**Debit** (m³/hari)", min_value=1.0, value=100.0)
-        coagulant = st.selectbox("**Jenis Koagulan**", ['FeCl3', 'Alum', 'PAC'])
-    
-    with col2:
-        dosage = stoichiometry_coagulant(BOD_in, Q_stoich, coagulant)
-        st.metric("**Kebutuhan Koagulan**", f"{dosage} kg/hari")
-        
-        st.info(f"**Rasio**: 1 mg {coagulant} per {8 if coagulant=='FeCl3' else 10 if coagulant=='Alum' else 6} mg BOD")
-    
-    # Tabel rekomendasi
-    st.subheader("📋 Rekomendasi Jar Test")
-    jar_data = {
-        'Koagulan': ['FeCl3', 'Alum', 'PAC'],
-        'Dosis Optimal': ['200-800 mg/L', '300-1000 mg/L', '150-600 mg/L'],
-        'pH Optimal': ['6.5-7.5', '6.0-7.5', '6.5-8.0']
-    }
-    st.table(pd.DataFrame(jar_data))
-
-# Halaman 3: Interactive Simulation
-elif page == "📊 Simulasi Real-time":
-    st.header("📊 Interactive Simulation")
-    
-    # Sliders untuk parameter
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        BOD_in_sim = st.slider("**BOD Masuk** (mg/L)", 50, 500, 200)
-    with col2:
-        Q_sim = st.slider("**Debit** (m³/hari)", 50, 500, 100)
-    with col3:
-        efficiency = st.slider("**Efisiensi (%)**", 50.0, 95.0, 85.0, 0.5)
-    
-    # Hitung output
-    BOD_out_sim = BOD_in_sim * (1 - efficiency/100)
-    
-    # Grafik real-time
-    fig = make_subplots(rows=2, cols=2,
-                       subplot_titles=('Efisiensi Penyisihan', 'Konsentrasi BOD', 
-                                    'Dimensi vs Debit', 'Regulatory Status'),
-                       specs=[[{"secondary_y": False}, {"secondary_y": False}],
-                              [{"secondary_y": False}, {"secondary_y": False}]])
-    
-    # Plot 1: Efisiensi
-    fig.add_trace(go.Scatter(x=[50,100,200,300,400,500], 
-                           y=[95,90,85,80,75,70],
-                           mode='lines+markers',
-                           name='Efisiensi'), row=1, col=1)
-    
-    # Plot 2: BOD in/out
-    fig.add_trace(go.Bar(x=['Masuk', 'Keluar'], y=[BOD_in_sim, BOD_out_sim],
-                        marker_color=['#FF6384', '#36A2EB']), row=1, col=2)
-    
-    # Plot 3: Dimensi vs Debit
-    dims = calculate_unit_sizing(Q_sim, 24)
-    fig.add_trace(go.Scatter(x=[50,100,200,300,400,500],
-                           y=[calculate_unit_sizing(q,24)['Volume'] for q in [50,100,200,300,400,500]],
-                           mode='lines', name='Volume'), row=2, col=1)
-    
-    # Plot 4: Regulatory
-    status_color = 'green' if BOD_out_sim <= BAKU_MUTU['BOD5'] else 'red'
-    fig.add_trace(go.Indicator(
-        mode="gauge+number+delta",
-        value=BOD_out_sim,
-        domain={'x': [0, 1], 'y': [0, 1]},
-        title={'text': "BOD (mg/L)"},
-        delta={'reference': BAKU_MUTU['BOD5']},
-        gauge={
-            'axis': {'range': [None, 100]},
-            'bar': {'color': status_color},
-            'steps': [
-                {'range': [0, 30], 'color': 'green'},
-                {'range': [30, 100], 'color': 'red'}],
-            'threshold': {
-                'line': {'color': "red", 'width': 4},
-                'thickness': 0.75,
-                'value': BAKU_MUTU['BOD5']}
-        }), row=2, col=2)
-    
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=waktu_series, y=bod_series, mode='lines', name='BOD', line=dict(color='green', width=3)))
+    fig.update_layout(title="Grafik Penurunan Kadar BOD terhadap Waktu Tinggal",
+                     xaxis_title="Waktu (Jam)", yaxis_title="Konsentrasi (mg/L)")
     st.plotly_chart(fig, use_container_width=True)
 
-# Halaman 4: Regulatory Checker
-elif page == "✅ Regulatory Checker":
-    st.header("✅ Regulatory Checker")
-    st.markdown("**PP No. 22 Tahun 2021 - Baku Mutu Domestik**")
+with tab2:
+    st.subheader("Rekomendasi Spesifikasi Unit")
+    c1, c2 = st.columns(2)
     
-    # Input data effluent
-    st.subheader("📥 Input Data Effluent")
-    col1, col2, col3, col4 = st.columns(4)
+    # Asumsi Bak Persegi Panjang (P = 2L)
+    lebar = np.sqrt(luas_permukaan / 2)
+    panjang = 2 * lebar
     
-    with col1:
-        BOD_eff = st.number_input("**BOD5** (mg/L)", 0.0, 200.0, 25.0)
-    with col2:
-        COD_eff = st.number_input("**COD** (mg/L)", 0.0, 500.0, 80.0)
-    with col3:
-        TSS_eff = st.number_input("**TSS** (mg/L)", 0.0, 200.0, 20.0)
-    with col4:
-        pH_eff = st.number_input("**pH**", 4.0, 12.0, 7.0)
-    
-    if st.button("🔍 Cek Kepatuhan", type="primary"):
-        effluent_data = {'BOD5': BOD_eff, 'COD': COD_eff, 'TSS': TSS_eff, 'pH': pH_eff}
-        status = check_regulation(effluent_data)
-        
-        # Status keseluruhan
-        overall_status = all(status.values())
-        status_class = "status-pass" if overall_status else "status-fail"
-        status_text = "✅ LULUS" if overall_status else "❌ GAGAL"
-        
-        st.markdown(f'<div class="metric-card"><h3>Status Keseluruhan: <span class="{status_class}">{status_text}</span></h3></div>', 
-                   unsafe_allow_html=True)
-        
-        # Tabel detail
-        results_df = pd.DataFrame({
-            'Parameter': list(status.keys()),
-            'Hasil (mg/L)': [effluent_data[k] if k != 'pH' else f"{effluent_data[k]:.1f}" for k in status.keys()],
-            'Baku Mutu': [f"{BAKU_MUTU[k]}" if k != 'pH' else f"{BAKU_MUTU[k][0]}-{BAKU_MUTU[k][1]}" for k in status.keys()],
-            'Status': ['✅ Lulus' if status[k] else '❌ Gagal' for k in status.keys()]
+    with c1:
+        st.write("### Dimensi Fisik")
+        df_dimensi = pd.DataFrame({
+            "Parameter": ["Panjang", "Lebar", "Kedalaman (SWD)", "Freeboard"],
+            "Nilai": [f"{panjang:.2f} m", f"{lebar:.2f} m", f"{kedalaman_rencana:.2f} m", "0.5 m"]
         })
+        st.table(df_dimensi)
         
-        st.table(results_df)
-        
-        # Gauge charts
-        fig = make_subplots(rows=1, cols=3, 
-                           subplot_titles=('BOD5', 'COD', 'TSS'),
-                           specs=[[{"secondary_y": False}, {"secondary_y": False}, {"secondary_y": False}]])
-        
-        params = ['BOD5', 'COD', 'TSS']
-        values = [BOD_eff, COD_eff, TSS_eff]
-        limits = [BAKU_MUTU[p] for p in params]
-        
-        for i, (param, val, limit) in enumerate(zip(params, values, limits)):
-            color = 'green' if val <= limit else 'red'
-            fig.add_trace(go.Indicator(
-                mode="gauge+number",
-                value=val,
-                domain={'x': [i*0.33, (i+1)*0.33], 'y': [0, 1]},
-                title={'text': param},
-                gauge={
-                    'axis': {'range': [0, max(limit*1.5, 100)]},
-                    'bar': {'color': color},
-                    'steps': [{'range': [0, limit], 'color': 'green'}, 
-                             {'range': [limit, max(limit*1.5, 100)], 'color': 'red'}],
-                    'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': limit}
-                }), row=1, col=i+1)
-        
-        st.plotly_chart(fig, use_container_width=True)
+    with c2:
+        st.write("### Kebutuhan Oksigen (Air Supply)")
+        # Perhitungan kasar kebutuhan udara untuk aerasi
+        sor = (debit * (bod_in - bod_out) / 1000) * 1.5 # kg O2/hari
+        st.info(f"Estimasi Kebutuhan Oksigen: **{sor:.2f} kg O2/hari**")
+        st.write("Gunakan Blower dengan kapasitas minimal 1.2x dari kebutuhan Standar Oxygen Requirement (SOR).")
 
-# Footer
-st.markdown("---")
-st.markdown("**© 2024 EcoEngineer Pro-Dash | Dibuat dengan ❤️ untuk Industri Lingkungan**")
+with tab3:
+    st.subheader("Kepatuhan Terhadap Baku Mutu")
+    # Contoh standar Baku Mutu (Permen LHK No. 68 Tahun 2016)
+    baku_mutu_bod = 30.0
+    
+    if bod_out <= baku_mutu_bod:
+        st.success(f"✅ AMAN: Kadar BOD akhir ({bod_out:.1f}) memenuhi syarat di bawah {baku_mutu_bod} mg/L.")
+    else:
+        st.error(f"⚠️ BAHAYA: Kadar BOD akhir ({bod_out:.1f}) MELEBIHI ambang batas {baku_mutu_bod} mg/L.")
+        st.warning("Saran: Tingkatkan HRT atau tambahkan dosis aerasi.")
+
+# --- FOOTER ---
+st.sidebar.markdown("---")
+st.sidebar.caption("EcoEng Simulator v1.0 | Menggunakan Model Kinetika Orde-1")
