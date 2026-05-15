@@ -9,7 +9,7 @@ import streamlit.components.v1 as components
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="EcoEngineer Pro-Dash", page_icon="🌱", layout="wide")
 
-# Fungsi Animasi Lottie via HTML (Paling Aman, Tidak Bikin Error)
+# Fungsi Animasi Lottie via HTML (Solusi Paling Stabil & Anti-Error)
 def st_lottie_embed(url, height=200):
     embed_code = f"""
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
@@ -19,7 +19,7 @@ def st_lottie_embed(url, height=200):
     """
     return components.html(embed_code, height=height + 10)
 
-# Link Animasi yang Stabil
+# Link Animasi Lottie Terbaru
 lottie_links = {
     "Intro": "https://lottie.host/80516b34-897b-4029-8797-29007c570993/9nL0o0iYkS.json",
     "Sizing": "https://lottie.host/9e4871e9-4e08-466d-96f7-3c976f62664d/U0V166S04A.json",
@@ -29,168 +29,190 @@ lottie_links = {
     "About": "https://lottie.host/7e0c4f1c-d72b-4b11-9721-657d90e0e01c/v6W70M7u5I.json"
 }
 
-# 2. STYLING CSS
+# 2. STYLING CSS CUSTOM
 st.markdown("""
 <style>
-.main-header {font-size: 2.8rem; color: #2E7D32; font-weight: bold;}
-.metric-card {background-color: #F1F8E9; padding: 1.5rem; border-radius: 12px; border-left: 6px solid #4CAF50; margin-bottom: 1rem;}
-.footer {text-align: center; margin-top: 50px; color: #757575; border-top: 1px solid #eee; padding-top: 20px;}
+    .main-header {font-size: 3rem; color: #2E7D32; font-weight: bold;}
+    .sub-header {font-size: 1.5rem; color: #1B5E20; font-weight: bold; margin-bottom: 10px;}
+    .metric-card {background-color: #F1F8E9; padding: 1.5rem; border-radius: 15px; border-left: 8px solid #4CAF50; margin-bottom: 1rem; box-shadow: 2px 2px 10px rgba(0,0,0,0.05);}
+    .footer {text-align: center; margin-top: 50px; color: #757575; border-top: 1px solid #eee; padding-top: 20px;}
+    .stButton>button {border-radius: 10px; height: 3em; transition: 0.3s;}
+    .stButton>button:hover {background-color: #2E7D32; color: white;}
 </style>
 """, unsafe_allow_html=True)
 
-# 3. LOGIKA BACKEND & KONSTANTA
+# 3. LOGIKA BACKEND
 BAKU_MUTU = {'BOD5': 30, 'COD': 100, 'TSS': 30, 'pH': (6, 9)}
 
 def calculate_unit_sizing(Q, td, SLR=24):
-    V, A = (Q * td / 24), (Q / SLR)
-    L, W, H = math.sqrt(A * 3), math.sqrt(A / 3), 3.5
+    V = Q * td / 24
+    A = Q / SLR
+    H = 3.5
+    L = math.sqrt(A * 3)
+    W = math.sqrt(A / 3)
     return {'Volume': round(V, 2), 'Luas': round(A, 2), 'Panjang': round(L, 2), 'Lebar': round(W, 2), 'Tinggi': H}
 
-# 4. REPORT MANAGEMENT (Session State)
+# 4. REPORT MANAGEMENT (Session State agar data tidak hilang saat navigasi)
 if 'full_report' not in st.session_state:
     st.session_state.full_report = pd.DataFrame(columns=['Kategori', 'Parameter', 'Nilai', 'Satuan'])
 
-def update_report(df_new):
-    st.session_state.full_report = pd.concat([st.session_state.full_report, df_new], ignore_index=True).drop_duplicates(subset=['Kategori', 'Parameter'], keep='last')
+def add_to_report(cat, param, val, unit):
+    new_entry = pd.DataFrame({'Kategori': [cat], 'Parameter': [param], 'Nilai': [val], 'Satuan': [unit]})
+    st.session_state.full_report = pd.concat([st.session_state.full_report, new_entry], ignore_index=True).drop_duplicates(subset=['Kategori', 'Parameter'], keep='last')
 
-# 5. SIDEBAR NAVIGATION & DOWNLOAD
+# 5. SIDEBAR NAVIGATION
 with st.sidebar:
-    st_lottie_embed(lottie_links["Intro"], height=100)
-    st.title("🌱 EcoEngineer Pro")
-    page = st.selectbox("Menu Utama:", ["🏠 Beranda", "🏗️ Unit Sizing", "🧪 Stoichiometry", "📊 Simulasi", "✅ Checker", "ℹ️ Tentang Aplikasi"])
+    st_lottie_embed(lottie_links["Intro"], height=120)
+    st.title("🌱 EcoEngineer Menu")
+    page = st.selectbox("Navigasi Fitur:", ["🏠 Beranda / Intro", "🏗️ Unit Sizing", "🧪 Stoichiometry", "📊 Simulasi", "✅ Checker", "ℹ️ Tentang Web"])
     
     st.divider()
-    st.subheader("📥 Download Report")
+    st.subheader("📥 Export Summary")
     if not st.session_state.full_report.empty:
-        header_text = [
+        # Template Laporan Rapi
+        header_data = [
             ["LAPORAN HASIL PENGUKURAN ECOENGINEER PRO-DASH", "", "", ""],
-            [f"Waktu Generate: {datetime.now().strftime('%Y-%m-%d %H:%M')}", "", "", ""],
-            ["Pembuat: [Nama Anda/Tim]", "", "", ""],
-            ["="*45, "="*20, "="*20, "="*10],
+            [f"Tanggal Cetak: {datetime.now().strftime('%d %B %Y %H:%M')}", "", "", ""],
+            ["Sumber: Sistem Perhitungan Teknik Lingkungan Terintegrasi", "", "", ""],
+            ["-"*50, "-"*20, "-"*20, "-"*10],
             ["KATEGORI", "PARAMETER", "NILAI", "SATUAN"]
         ]
-        header_df = pd.DataFrame(header_text, columns=['Kategori', 'Parameter', 'Nilai', 'Satuan'])
-        final_download_df = pd.concat([header_df, st.session_state.full_report], ignore_index=True)
+        h_df = pd.DataFrame(header_data, columns=['Kategori', 'Parameter', 'Nilai', 'Satuan'])
+        final_csv_df = pd.concat([h_df, st.session_state.full_report], ignore_index=True)
         
         st.download_button(
-            label="Download Laporan (CSV)",
-            data=final_download_df.to_csv(index=False, header=False).encode('utf-8'),
-            file_name=f'Report_EcoEngineer_{datetime.now().strftime("%Y%m%d")}.csv',
+            label="Download Full Report (CSV)",
+            data=final_download_df.to_csv(index=False, header=False).encode('utf-8') if 'final_download_df' in locals() else final_csv_df.to_csv(index=False, header=False).encode('utf-8'),
+            file_name=f'EcoReport_{datetime.now().strftime("%Y%m%d")}.csv',
             mime='text/csv',
             use_container_width=True
         )
-        if st.button("🗑️ Reset Data"):
+        if st.button("🗑️ Reset Semua Data"):
             st.session_state.full_report = pd.DataFrame(columns=['Kategori', 'Parameter', 'Nilai', 'Satuan'])
             st.rerun()
     else:
-        st.info("Hitung data untuk ekspor.")
+        st.info("Lakukan perhitungan di setiap menu untuk mengumpulkan data laporan.")
 
-# 6. KONTEN HALAMAN
+# 6. KONTEN HALAMAN UTAMA
 
 # --- 🏠 BERANDA ---
-if page == "🏠 Beranda":
+if page == "🏠 Beranda / Intro":
     c1, c2 = st.columns([2, 1])
     with c1:
         st.markdown('<h1 class="main-header">EcoEngineer Pro-Dash</h1>', unsafe_allow_html=True)
-        st.write("### Smart Digital Platform for Wastewater Engineering")
-        st.write("Solusi integratif untuk perancangan IPAL, perhitungan dosis kimia, dan verifikasi regulasi dalam satu platform.")
+        st.write("### Solusi Engineering Pengolahan Air Limbah Terintegrasi")
+        st.write("""
+        Selamat datang profesional lingkungan! Platform ini dirancang untuk mempercepat alur kerja teknik Anda:
+        - **Desain Unit:** Sizing bak pengolahan otomatis dengan visualisasi 3D.
+        - **Kalkulasi Kimia:** Hitung kebutuhan koagulan secara stoikiometri.
+        - **Analisis Kepatuhan:** Cek kualitas air terhadap standar baku mutu Permen LHK.
+        """)
     with c2: st_lottie_embed(lottie_links["Intro"])
 
 # --- 🏗️ UNIT SIZING ---
 elif page == "🏗️ Unit Sizing":
-    st.header("🏗️ Unit Sizing (Dimensi Bak)")
+    st.header("🏗️ Perancangan Dimensi Bak (Unit Sizing)")
     col1, col2 = st.columns([1, 2])
     with col1:
         st_lottie_embed(lottie_links["Sizing"], height=150)
-        Q = st.number_input("Debit Air Limbah (m³/hari)", value=100.0)
-        td = st.number_input("Retention Time (jam)", value=24.0)
-        if st.button("💾 Hitung Dimensi", type="primary", use_container_width=True):
-            d = calculate_unit_sizing(Q, td)
-            st.session_state.last_dims = d
-            update_report(pd.DataFrame({'Kategori':['Sizing']*3, 'Parameter':['Volume','Luas','Dimensi PxL'], 'Nilai':[d['Volume'], d['Luas'], f"{d['Panjang']}x{d['Lebar']}"], 'Satuan':['m3','m2','m']}))
+        q_in = st.number_input("Debit (m³/hari)", value=100.0, step=10.0)
+        td_in = st.number_input("Waktu Tinggal (jam)", value=24.0, step=1.0)
+        if st.button("💾 Proses & Simpan", type="primary", use_container_width=True):
+            res = calculate_unit_sizing(q_in, td_in)
+            st.session_state.sizing_res = res
+            add_to_report('Unit Sizing', 'Debit', q_in, 'm3/hari')
+            add_to_report('Unit Sizing', 'Dimensi (PxLxT)', f"{res['Panjang']}x{res['Lebar']}x3.5", 'meter')
     
-    if 'last_dims' in st.session_state:
+    if 'sizing_res' in st.session_state:
+        d = st.session_state.sizing_res
         with col2:
-            d = st.session_state.last_dims
-            st.subheader("📐 Hasil Perhitungan")
-            m1, m2 = st.columns(2)
-            m1.metric("Volume Efektif", f"{d['Volume']} m³")
-            m2.metric("Luas Permukaan", f"{d['Luas']} m²")
-            st.markdown(f"**Rekomendasi Dimensi (PxLxT):** \n### {d['Panjang']}m x {d['Lebar']}m x 3.5m")
-            fig = go.Figure(data=[go.Mesh3d(x=[0,d['Panjang'],d['Panjang'],0,0,d['Panjang'],d['Panjang'],0], y=[0,0,d['Lebar'],d['Lebar'],0,0,d['Lebar'],d['Lebar']], z=[0,0,0,0,3.5,3.5,3.5,3.5], color='green', opacity=0.5)])
+            st.markdown('<p class="sub-header">📐 Hasil Dimensi</p>', unsafe_allow_html=True)
+            m1, m2, m3 = st.columns(3)
+            m1.metric("Volume", f"{d['Volume']} m³")
+            m2.metric("Panjang", f"{d['Panjang']} m")
+            m3.metric("Lebar", f"{d['Lebar']} m")
+            
+            fig = go.Figure(data=[go.Mesh3d(x=[0,d['Panjang'],d['Panjang'],0,0,d['Panjang'],d['Panjang'],0], y=[0,0,d['Lebar'],d['Lebar'],0,0,d['Lebar'],d['Lebar']], z=[0,0,0,0,3.5,3.5,3.5,3.5], color='#4CAF50', opacity=0.6)])
+            fig.update_layout(scene=dict(xaxis_title='P', yaxis_title='L', zaxis_title='T'), margin=dict(l=0,r=0,b=0,t=0))
             st.plotly_chart(fig, use_container_width=True)
 
 # --- 🧪 STOICHIOMETRY ---
 elif page == "🧪 Stoichiometry":
-    st.header("🧪 Stoichiometry (Kebutuhan Kimia)")
+    st.header("🧪 Stoichiometry (Kebutuhan Koagulan)")
     col1, col2 = st.columns([1, 1])
     with col1:
         st_lottie_embed(lottie_links["Stoich"], height=150)
-        b_in = st.number_input("BOD Masuk (mg/L)", value=200.0)
-        q_s = st.number_input("Debit (m³/hari)", value=100.0)
-        coag = st.selectbox("Jenis Koagulan", ['FeCl3', 'Alum', 'PAC'])
-        if st.button("🧪 Hitung Dosis", type="primary", use_container_width=True):
-            ratios = {'FeCl3': 8, 'Alum': 10, 'PAC': 6}
-            res = round(b_in * ratios.get(coag) * q_s / 1000, 2)
-            st.session_state.last_stoich = {"val": res, "name": coag}
-            update_report(pd.DataFrame({'Kategori':['Stoich'], 'Parameter':[f'Kebutuhan {coag}'], 'Nilai':[res], 'Satuan':['kg/hari']}))
+        bod_in = st.number_input("BOD Influen (mg/L)", value=200.0)
+        q_val = st.number_input("Debit Operasional (m³/hari)", value=100.0)
+        c_type = st.selectbox("Jenis Koagulan", ['FeCl3', 'Alum', 'PAC'])
+        if st.button("🧪 Hitung Dosis", use_container_width=True):
+            dose = stoichiometry_coagulant(bod_in, q_val, c_type)
+            st.session_state.stoich_res = {"val": dose, "type": c_type}
+            add_to_report('Stoichiometry', f'Dosis {c_type}', dose, 'kg/hari')
     
-    if 'last_stoich' in st.session_state:
+    if 'stoich_res' in st.session_state:
         with col2:
-            st.subheader("🧪 Hasil Dosis")
-            st.metric(f"Kebutuhan {st.session_state.last_stoich['name']}", f"{st.session_state.last_stoich['val']} kg/hari")
-            st.info("Dosis didasarkan pada rasio teoritis penyisihan BOD terhadap koagulan.")
+            st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+            st.write(f"### Kebutuhan {st.session_state.stoich_res['type']}")
+            st.metric("Total Dosis", f"{st.session_state.stoich_res['val']} kg/hari")
+            st.write("</div>", unsafe_allow_html=True)
 
 # --- 📊 SIMULASI ---
 elif page == "📊 Simulasi":
-    st.header("📊 Simulasi Performa IPAL")
-    col1, col2 = st.columns([1, 2])
-    with col1:
+    st.header("📊 Simulasi Performa Pengolahan")
+    c1, c2 = st.columns([1, 2])
+    with c1:
         st_lottie_embed(lottie_links["Sim"], height=150)
-        eff = st.slider("Efisiensi Alat (%)", 50, 99, 85)
-        b_in_s = st.number_input("BOD Influent (mg/L)", value=200.0)
-        if st.button("📊 Simpan Hasil", use_container_width=True):
-            b_out = round(b_in_s * (1 - eff/100), 2)
-            update_report(pd.DataFrame({'Kategori':['Simulasi'], 'Parameter':['BOD Effluent'], 'Nilai':[b_out], 'Satuan':['mg/L']}))
+        eff_val = st.slider("Efisiensi Penyisihan (%)", 50, 99, 85)
+        bod_influent = st.number_input("BOD Masuk (mg/L)", value=200.0)
+        bod_effluent = round(bod_influent * (1 - eff_val/100), 2)
+        if st.button("📊 Simpan ke Report"):
+            add_to_report('Simulasi', 'Estimasi Effluent', bod_effluent, 'mg/L')
             st.success("Tersimpan!")
-    with col2:
-        b_out = round(b_in_s * (1 - eff/100), 2)
-        st.metric("Estimasi BOD Keluar", f"{b_out} mg/L")
-        st.bar_chart({'In (BOD)': b_in_s, 'Out (BOD)': b_out})
+    with c2:
+        st.metric("Estimasi BOD Akhir", f"{bod_effluent} mg/L")
+        st.bar_chart({'Influent (BOD)': bod_influent, 'Effluent (BOD)': bod_effluent})
 
 # --- ✅ CHECKER ---
 elif page == "✅ Checker":
-    st.header("✅ Regulatory Checker")
+    st.header("✅ Baku Mutu Compliance")
     col1, col2 = st.columns([1, 2])
     with col1:
         st_lottie_embed(lottie_links["Check"], height=150)
-        b_e = st.number_input("BOD5", value=25.0)
-        c_e = st.number_input("COD", value=80.0)
-        t_e = st.number_input("TSS", value=20.0)
-        p_e = st.number_input("pH", value=7.0)
-    
-    if st.button("🔍 Jalankan Cek Kepatuhan", type="primary", use_container_width=True):
-        res = {'BOD5': b_e <= 30, 'COD': c_e <= 100, 'TSS': t_e <= 30, 'pH': 6 <= p_e <= 9}
-        status = "LULUS" if all(res.values()) else "GAGAL"
-        with col2:
-            st.markdown(f'<div class="metric-card"><h3>Status Akhir: {status}</h3></div>', unsafe_allow_html=True)
-            st.table(pd.DataFrame({'Parameter': res.keys(), 'Nilai': [b_e, c_e, t_e, p_e], 'Status': ['✅ OK' if v else '❌ Melebihi' for v in res.values()]}))
-            update_report(pd.DataFrame({'Kategori':['Checker'], 'Parameter':['Kepatuhan'], 'Nilai':[status], 'Satuan':['-']}))
+        b_e = st.number_input("BOD5", value=25.0); c_e = st.number_input("COD", value=80.0)
+        t_e = st.number_input("TSS", value=20.0); p_e = st.number_input("pH", value=7.0)
+        if st.button("🔍 Jalankan Verifikasi", type="primary", use_container_width=True):
+            res_check = {'BOD5': b_e <= 30, 'COD': c_e <= 100, 'TSS': t_e <= 30, 'pH': 6 <= p_e <= 9}
+            st.session_state.check_res = {"status": "LULUS" if all(res_check.values()) else "GAGAL", "details": res_check, "vals": [b_e, c_e, t_e, p_e]}
+            add_to_report('Checker', 'Status Kepatuhan', st.session_state.check_res["status"], '-')
 
-# --- ℹ️ TENTANG APLIKASI ---
-elif page == "ℹ️ Tentang Aplikasi":
-    st.header("ℹ️ Mengenai Platform")
+    if 'check_res' in st.session_state:
+        with col2:
+            st.markdown(f'<div class="metric-card"><h3>STATUS: {st.session_state.check_res["status"]}</h3></div>', unsafe_allow_html=True)
+            st.table(pd.DataFrame({
+                'Parameter': ['BOD5', 'COD', 'TSS', 'pH'],
+                'Hasil': st.session_state.check_res["vals"],
+                'Baku Mutu': [30, 100, 30, "6 - 9"],
+                'Keterangan': ['✅' if v else '❌' for v in st.session_state.check_res["details"].values()]
+            }))
+
+# --- ℹ️ TENTANG WEB ---
+elif page == "ℹ️ Tentang Web":
+    st.header("ℹ️ Mengenai EcoEngineer Pro-Dash")
     c1, c2 = st.columns([2, 1])
     with c1:
         st.markdown("""
-        **EcoEngineer Pro-Dash** dikembangkan untuk standarisasi perhitungan teknis lingkungan.
+        **EcoEngineer Pro-Dash** adalah instrumen digital yang dirancang untuk mendukung pengambilan keputusan teknis di bidang teknik lingkungan.
         
-        **Referensi Teknis:**
-        * **Permen LHK P.68/2016:** Standar Baku Mutu Air Limbah.
-        * **Metcalf & Eddy:** Wastewater Engineering: Treatment and Resource Recovery.
-        * **SNI 6774:2008:** Tata cara perencanaan unit paket IPAL.
+        **Dasar Hukum & Teknis:**
+        * **Regulasi:** Peraturan Menteri LHK No. P.68 Tahun 2016 tentang Baku Mutu Air Limbah Domestik.
+        * **Metodologi Sizing:** Berdasarkan standar *Retention Time* dan *Surface Loading Rate* industri.
+        * **Stoikiometri:** Didasarkan pada rasio teoritis penyisihan beban organik menggunakan koagulan kimia.
+        
+        **Tim Pengembang:** [Nama Anda / Tim Anda]
+        **Versi:** 1.0 (Build 2026)
         """)
     with c2: st_lottie_embed(lottie_links["About"])
 
 # 7. FOOTER
-st.markdown(f'<div class="footer"><p>© {datetime.now().year} EcoEngineer Pro-Dash | Built for Sustainability</p></div>', unsafe_allow_html=True)
+st.markdown(f'<div class="footer"><p>© {datetime.now().year} EcoEngineer Pro-Dash | Solusi Digital Untuk Lingkungan Berkelanjutan</p></div>', unsafe_allow_html=True)
