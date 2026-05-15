@@ -146,7 +146,7 @@ elif page == "🏗️ Unit Sizing":
 # --- 🧪 STOICHIOMETRY ---
 elif page == "🧪 Stoichiometry":
     st.header("🧪 Stoichiometry (Kebutuhan Koagulan)")
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.columns([1, 2])
     with col1:
         st_lottie_embed(lottie_links["Stoich"], height=150)
         bod_in = st.number_input("BOD Influen (mg/L)", value=200.0)
