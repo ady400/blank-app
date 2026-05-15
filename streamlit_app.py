@@ -47,8 +47,9 @@ st.markdown('<h1 class="main-header">🌱 EcoEngineer Pro-Dash</h1>', unsafe_all
 with st.sidebar:
     st.title("🌱 EcoEngineer Pro-Dash")
     st.sidebar.selectbox("Pilih Fitur:", ["🏗️ Unit Sizing", "🧪 Stoichiometry", "📊 Simulasi", "✅ Checker"])
-
-    if page == "🏗️ Unit Sizing":
+    
+#unit sizing
+    elif page == "🏗️ Unit Sizing":
        st.header("🏗️ Automatic Unit Sizing")
         
        col1, col2 = st.columns(2)
@@ -90,7 +91,8 @@ with st.sidebar:
                     zaxis_title='Tinggi (m)'
                 ))
                 st.plotly_chart(fig, use_container_width=True)
-    
+                
+#Stoichiometry   
     elif page == "🧪 Stoichiometry":
         st.header("🧪 Stoichiometry Calculator")
         
@@ -131,7 +133,8 @@ with st.sidebar:
         fig.add_trace(go.Bar(x=['Masuk', 'Keluar'], y=[BOD_in_sim, BOD_out_sim],
                             marker_color=['#FF6384', '#36A2EB']))
         st.plotly_chart(fig, use_container_width=True)
-    
+
+#Checker  
     elif page == "✅ Checker":
         st.header("✅ Regulatory Checker")
         col1, col2, col3, col4 = st.columns(4)
