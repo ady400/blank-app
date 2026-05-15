@@ -45,8 +45,8 @@ st.markdown('<h1 class="main-header">🌱 EcoEngineer Pro-Dash</h1>', unsafe_all
 
 # Sidebar
 with st.sidebar:
-st.title("🌱 EcoEngineer Pro-Dash")
-st.sidebar.selectbox("Pilih Fitur:", ["🏗️ Unit Sizing", "🧪 Stoichiometry", "📊 Simulasi", "✅ Checker"])
+    st.title("🌱 EcoEngineer Pro-Dash")
+    st.sidebar.selectbox("Pilih Fitur:", ["🏗️ Unit Sizing", "🧪 Stoichiometry", "📊 Simulasi", "✅ Checker"])
 
 if page == "🏗️ Unit Sizing":
    st.header("🏗️ Automatic Unit Sizing")
