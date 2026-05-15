@@ -49,7 +49,7 @@ with st.sidebar:
     st.sidebar.selectbox("Pilih Fitur:", ["🏗️ Unit Sizing", "🧪 Stoichiometry", "📊 Simulasi", "✅ Checker"])
     
 #unit sizing
-    elif page == "🏗️ Unit Sizing":
+    if page == "🏗️ Unit Sizing":
        st.header("🏗️ Automatic Unit Sizing")
         
        col1, col2 = st.columns(2)
@@ -118,6 +118,8 @@ with st.sidebar:
             'pH Optimal': ['6.5-7.5', '6.0-7.5', '6.5-8.0']
         }
         st.table(pd.DataFrame(jar_data))
+        
+#simulasi        
     elif page == "📊 Simulasi":
         st.header("📊 Interactive Simulation")
         col1, col2, col3 = st.columns(3)
