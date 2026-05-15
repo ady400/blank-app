@@ -123,18 +123,25 @@ elif page == "🏗️ Unit Sizing":
             add_to_report('Unit Sizing', 'Debit', q_in, 'm3/hari')
             add_to_report('Unit Sizing', 'Dimensi (PxLxT)', f"{res['Panjang']}x{res['Lebar']}x3.5", 'meter')
     
-    if 'sizing_res' in st.session_state:
-        d = st.session_state.sizing_res
+   col1, col2 = st.columns([1, 2])
+    with col1:
+        Q = st.number_input("Debit (Q) (m³/hari)", value=100.0)
+        td = st.number_input("Waktu Tinggal (jam)", value=24.0)
+        SLR = st.number_input("SLR (m³/m².hari)", value=24.0)
+        if st.button("💾 Hitung & Simpan", type="primary", use_container_width=True):
+            dims = calculate_unit_sizing(Q, td, SLR)
+            update_report(pd.DataFrame({'Kategori':['Unit Sizing']*3, 'Parameter':['Volume', 'Luas', 'Dimensi'], 'Nilai':[dims['Volume'], dims['Luas'], f"{dims['Panjang']}x{dims['Lebar']}x{dims['Tinggi']}"], 'Satuan':['m3', 'm2', 'meter']}))
+            st.session_state.last_dims = dims
+
+    if 'last_dims' in st.session_state:
         with col2:
-            st.markdown('<p class="sub-header">📐 Hasil Dimensi</p>', unsafe_allow_html=True)
+            d = st.session_state.last_dims
             m1, m2, m3 = st.columns(3)
             m1.metric("Volume", f"{d['Volume']} m³")
-            m2.metric("Panjang", f"{d['Panjang']} m")
-            m3.metric("Lebar", f"{d['Lebar']} m")
-            
-            fig = go.Figure(data=[go.Mesh3d(x=[0,d['Panjang'],d['Panjang'],0,0,d['Panjang'],d['Panjang'],0], y=[0,0,d['Lebar'],d['Lebar'],0,0,d['Lebar'],d['Lebar']], z=[0,0,0,0,3.5,3.5,3.5,3.5], color='#4CAF50', opacity=0.6)])
-            fig.update_layout(scene=dict(xaxis_title='P', yaxis_title='L', zaxis_title='T'), margin=dict(l=0,r=0,b=0,t=0))
-            st.plotly_chart(fig, use_container_width=True)
+            m2.metric("Luas", f"{d['Luas']} m²")
+            m3.markdown(f"**Dimensi PxLxT:**\n### {d['Panjang']}x{d['Lebar']}x{d['Tinggi']} m")
+            fig = go.Figure(data=[go.Mesh3d(x=[0,d['Panjang'],d['Panjang'],0,0,d['Panjang'],d['Panjang'],0], y=[0,0,d['Lebar'],d['Lebar'],0,0,d['Lebar'],d['Lebar']], z=[0,0,0,0,d['Tinggi'],d['Tinggi'],d['Tinggi'],d['Tinggi']], color='lightgreen', opacity=0.8)])
+            st.plotly_chart(fig, use_container_width=Tr
 
 # --- 🧪 STOICHIOMETRY ---
 elif page == "🧪 Stoichiometry":
