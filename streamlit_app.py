@@ -43,7 +43,7 @@ def check_regulation(effluent):
 
 st.markdown('<h1 class="main-header">🌱 EcoEngineer Pro-Dash</h1>', unsafe_allow_html=True)
 
-# Sidebar
+# page
 with st.sidebar:
     st.title("🌱 EcoEngineer Pro-Dash")
     st.sidebar.selectbox("Pilih Fitur:", ["🏗️ Unit Sizing", "🧪 Stoichiometry", "📊 Simulasi", "✅ Checker"])
