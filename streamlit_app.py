@@ -196,54 +196,82 @@ elif menu == "📊 Simulator & Kalkulator IKA":
 
 # --- MENU 3: TREN HISTORIS & UNDUH DATA ---
 elif menu == "📈 Tren Historis & Unduh Data":
-    st.title("📈 Analisis Grafik Tren & Pusat Unduhan")
-    st.write("Halaman ini menyajikan visualisasi data berkala laboratorium dan fitur ekspor file.")
+    st.title("📈 Input Data Harian & Analisis Tren")
+    st.write("Masukkan atau edit data hasil uji lab harian pada tabel di bawah. Grafik akan terupdate secara otomatis!")
     st.markdown("---")
-    
-    # 1. Grafik Interaktif Plotly
-    st.markdown("### 📊 Tren Nilai Indeks Pencemaran (10 Hari Terakhir)")
-    
-    # Membuat Line Chart Interaktif dengan Plotly
-    fig = px.line(
-        data_historis, 
-        x="Tanggal", 
-        y="Indeks Pencemaran", 
-        title="Fluktuasi Nilai IP Harian",
-        markers=True,
-        template="plotly_white"
+
+    # 1. Inisialisasi Data Default jika belum ada (menggunakan Session State agar data tidak hilang saat pindah menu)
+    if 'df_harian' not in st.session_state:
+        dates = pd.date_range(start="2026-05-01", periods=5, freq='D')
+        st.session_state.df_harian = pd.DataFrame({
+            "Tanggal": dates.strftime('%Y-%m-%d'),
+            "pH": [7.2, 6.8, 8.1, 5.5, 7.0],
+            "DO (mg/L)": [6.5, 5.8, 4.2, 3.2, 6.1],
+            "BOD (mg/L)": [2.1, 2.8, 3.5, 6.5, 2.9],
+            "TSS (mg/L)": [15, 22, 45, 65, 18]
+        })
+
+    # 2. Fitur Input Data (Data Editor)
+    st.markdown("### 📝 Tabel Input Data (Bisa di-edit langsung)")
+    # Data editor memungkinkan user menambah baris atau mengubah angka langsung di web
+    edited_df = st.data_editor(
+        st.session_state.df_harian, 
+        num_rows="dynamic", # Memungkinkan user tambah baris sendiri
+        use_container_width=True,
+        key="data_editor_ika"
     )
-    # Tambahkan garis batas ambang pencemaran (IP = 1.0)
-    fig.add_hline(y=1.0, line_dash="dash", line_color="green", annotation_text="Batas Baku Mutu (IP=1)")
-    fig.update_layout(margin=dict(l=20, r=20, t=40, b=20)) # Opsional, buat atur margin saja
-    st.plotly_chart(fig, use_container_width=True) # Parameter adaptif ditaruh di sini
     
-    st.markdown("---")
+    # Update session state dengan data yang sudah di-edit
+    st.session_state.df_harian = edited_df
+
+    # 3. Hitung Indeks Pencemaran (IP) secara otomatis untuk grafik
+    # Kita buat kolom baru 'IP' berdasarkan rumus yang sudah kita buat tadi
+    def apply_ip(row):
+        return hitung_indeks_pencemaran(row['pH'], row['DO (mg/L)'], row['BOD (mg/L)'], row['TSS (mg/L)'])
     
-    # 2. Tabel Data & Tombol Download
-    col_tabel, col_dev = st.columns([3, 2])
-    
-    with col_tabel:
-        st.markdown("### 💾 Spreadsheet Log Data")
-        st.dataframe(data_historis, use_container_width=True)
+    try:
+        display_df = edited_df.copy()
+        display_df['IP'] = display_df.apply(apply_ip, axis=1)
         
-        # Fitur unduhan CSV langsung
-        csv = data_historis.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="📥 Download Data CSV Lengkap",
-            data=csv,
-            file_name="Log_Kualitas_Air_2026.csv",
-            mime="text/csv",
-            use_container_width=True
+        st.markdown("---")
+        
+        # 4. Grafik Tren Dinamis
+        st.markdown("### 📊 Visualisasi Tren Kualitas Air")
+        
+        # Pilih parameter yang mau dilihat trennya
+        param_pilihan = st.selectbox("Pilih Parameter untuk Grafik:", ["IP", "pH", "DO (mg/L)", "BOD (mg/L)", "TSS (mg/L)"])
+        
+        fig = px.line(
+            display_df, 
+            x="Tanggal", 
+            y=param_pilihan, 
+            title=f"Tren Harian: {param_pilihan}",
+            markers=True,
+            line_shape="linear",
+            template="plotly_white",
+            color_discrete_sequence=['#1f77b4']
         )
         
-    with col_dev:
-        st.markdown("### 👤 Kredensial Pengembang & Hak Cipta")
-        st.markdown("""
-        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #dee2e6;">
-            <h4>Sistem Informasi Lingkungan</h4>
-            <p><b>Dikembangkan oleh:</b> Tim Pengembang Web K3 & Lingkungan</p>
-            <p><b>Metodologi:</b> Pembobotan Parameter KepmenLH No. 115 Tahun 2003 / PP No. 22 Tahun 2021 Lampiran VI</p>
-            <p><b>Versi Aplikasi:</b> v2.0 (Premium & Responsive Layout)</p>
-            <p><i>Data dikumpulkan secara berkala melalui sensor IoT dan uji sampel basah laboratorium.</i></p>
-        </div>
-        """, unsafe_allow_html=True)
+        # Tambahkan garis batas aman jika yang dipilih adalah IP
+        if param_pilihan == "IP":
+            fig.add_hline(y=1.0, line_dash="dash", line_color="green", annotation_text="Batas Aman (IP=1)")
+        
+        st.plotly_chart(fig, use_container_width=True)
+
+        # 5. Fitur Unduh Data
+        st.markdown("### 💾 Ekspor Laporan")
+        col_dl1, col_dl2 = st.columns(2)
+        with col_dl1:
+            csv = display_df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="📥 Download Data ke CSV (.csv)",
+                data=csv,
+                file_name=f"Laporan_Kualitas_Air_{pd.Timestamp.now().strftime('%Y%m%d')}.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
+        with col_dl2:
+            st.info("💡 **Tips:** Anda bisa menambah baris baru dengan klik simbol '+' di bawah tabel.")
+
+    except Exception as e:
+        st.error(f"Pastikan semua kolom angka terisi dengan benar! Error: {e}")
