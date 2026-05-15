@@ -43,12 +43,12 @@ def check_regulation(effluent):
 
 st.markdown('<h1 class="main-header">🌱 EcoEngineer Pro-Dash</h1>', unsafe_allow_html=True)
 
-page=
+#page
 with st.sidebar:
     st.title("🌱 EcoEngineer Pro-Dash")
     st.sidebar.selectbox("Pilih Fitur:", ["🏗️ Unit Sizing", "🧪 Stoichiometry", "📊 Simulasi", "✅ Checker"])
 
-if page == "🏗️ Unit Sizing":
+elif page == "🏗️ Unit Sizing":
    st.header("🏗️ Automatic Unit Sizing")
     
    col1, col2 = st.columns(2)
