@@ -48,49 +48,49 @@ with st.sidebar:
     st.title("🌱 EcoEngineer Pro-Dash")
     st.sidebar.selectbox("Pilih Fitur:", ["🏗️ Unit Sizing", "🧪 Stoichiometry", "📊 Simulasi", "✅ Checker"])
 
-elif page == "🏗️ Unit Sizing":
-   st.header("🏗️ Automatic Unit Sizing")
+    elif page == "🏗️ Unit Sizing":
+       st.header("🏗️ Automatic Unit Sizing")
+        
+       col1, col2 = st.columns(2)
+        
+       with col1:
+            st.subheader("Input Data")
+            Q = st.number_input("**Debit (Q)** (m³/hari)", min_value=1.0, value=100.0, step=10.0)
+            td = st.number_input("**Waktu Tinggal (t_d)** (jam)", min_value=1.0, value=24.0, step=1.0)
+            SLR = st.number_input("**Surface Loading Rate** (m³/m².hari)", min_value=5.0, value=24.0, step=1.0)
+        
+       with col2:
+            if st.button("💾 Hitung Dimensi", type="primary"):
+                dimensions = calculate_unit_sizing(Q, td, SLR)
+                
+                st.subheader("📐 Hasil Dimensi Bak")
+                col_a, col_b, col_c = st.columns(3)
+                
+                with col_a:
+                    st.metric("**Volume**", f"{dimensions['Volume']} m³")
+                with col_b:
+                    st.metric("**Luas**", f"{dimensions['Luas']} m²")
+                with col_c:
+                    st.metric("**P x L x T**", f"{dimensions['Panjang']} x {dimensions['Lebar']} x {dimensions['Tinggi']} m")
+                
+                # Gambar 3D sederhana
+                fig = go.Figure(data=[go.Mesh3d(
+                    x=[0, dimensions['Panjang'], dimensions['Panjang'], 0,
+                       0, dimensions['Panjang'], dimensions['Panjang'], 0],
+                    y=[0, 0, dimensions['Lebar'], dimensions['Lebar'],
+                       0, 0, dimensions['Lebar'], dimensions['Lebar']],
+                    z=[0, 0, 0, 0, dimensions['Tinggi'], dimensions['Tinggi'], 
+                       dimensions['Tinggi'], dimensions['Tinggi']],
+                    color='lightblue',
+                    opacity=0.7
+                )])
+                fig.update_layout(title="Visualisasi 3D Bak", scene=dict(
+                    xaxis_title='Panjang (m)',
+                    yaxis_title='Lebar (m)',
+                    zaxis_title='Tinggi (m)'
+                ))
+                st.plotly_chart(fig, use_container_width=True)
     
-   col1, col2 = st.columns(2)
-    
-   with col1:
-        st.subheader("Input Data")
-        Q = st.number_input("**Debit (Q)** (m³/hari)", min_value=1.0, value=100.0, step=10.0)
-        td = st.number_input("**Waktu Tinggal (t_d)** (jam)", min_value=1.0, value=24.0, step=1.0)
-        SLR = st.number_input("**Surface Loading Rate** (m³/m².hari)", min_value=5.0, value=24.0, step=1.0)
-    
-   with col2:
-        if st.button("💾 Hitung Dimensi", type="primary"):
-            dimensions = calculate_unit_sizing(Q, td, SLR)
-            
-            st.subheader("📐 Hasil Dimensi Bak")
-            col_a, col_b, col_c = st.columns(3)
-            
-            with col_a:
-                st.metric("**Volume**", f"{dimensions['Volume']} m³")
-            with col_b:
-                st.metric("**Luas**", f"{dimensions['Luas']} m²")
-            with col_c:
-                st.metric("**P x L x T**", f"{dimensions['Panjang']} x {dimensions['Lebar']} x {dimensions['Tinggi']} m")
-            
-            # Gambar 3D sederhana
-            fig = go.Figure(data=[go.Mesh3d(
-                x=[0, dimensions['Panjang'], dimensions['Panjang'], 0,
-                   0, dimensions['Panjang'], dimensions['Panjang'], 0],
-                y=[0, 0, dimensions['Lebar'], dimensions['Lebar'],
-                   0, 0, dimensions['Lebar'], dimensions['Lebar']],
-                z=[0, 0, 0, 0, dimensions['Tinggi'], dimensions['Tinggi'], 
-                   dimensions['Tinggi'], dimensions['Tinggi']],
-                color='lightblue',
-                opacity=0.7
-            )])
-            fig.update_layout(title="Visualisasi 3D Bak", scene=dict(
-                xaxis_title='Panjang (m)',
-                yaxis_title='Lebar (m)',
-                zaxis_title='Tinggi (m)'
-            ))
-            st.plotly_chart(fig, use_container_width=True)
-
 elif page == "🧪 Stoichiometry":
     st.header("🧪 Stoichiometry Calculator")
     
