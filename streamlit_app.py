@@ -214,8 +214,8 @@ elif menu == "📈 Tren Historis & Unduh Data":
     )
     # Tambahkan garis batas ambang pencemaran (IP = 1.0)
     fig.add_hline(y=1.0, line_dash="dash", line_color="green", annotation_text="Batas Baku Mutu (IP=1)")
-    fig.update_layout(use_container_width=True)
-    st.plotly_chart(fig, use_container_width=True) # Grafik otomatis membesar/mengecil mengikuti layar
+    fig.update_layout(margin=dict(l=20, r=20, t=40, b=20)) # Opsional, buat atur margin saja
+    st.plotly_chart(fig, use_container_width=True) # Parameter adaptif ditaruh di sini
     
     st.markdown("---")
     
