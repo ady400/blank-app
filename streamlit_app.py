@@ -48,7 +48,7 @@ with st.sidebar:
     st.title("🌱 EcoEngineer Pro-Dash")
     st.sidebar.selectbox("Pilih Fitur:", ["🏗️ Unit Sizing", "🧪 Stoichiometry", "📊 Simulasi", "✅ Checker"])
 
-    elif page == "🏗️ Unit Sizing":
+    if page == "🏗️ Unit Sizing":
        st.header("🏗️ Automatic Unit Sizing")
         
        col1, col2 = st.columns(2)
