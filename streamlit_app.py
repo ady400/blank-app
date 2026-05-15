@@ -121,7 +121,7 @@ elif page == "🏗️ Unit Sizing":
             res = calculate_unit_sizing(q_in, td_in)
             st.session_state.sizing_res = res
             add_to_report('Unit Sizing', 'Debit', q_in, 'm3/hari')
-            add_to_report('Unit Sizing', 'Dimensi (PxLxT)', f"{res['Panjang']}x{res['Lebar']}x3.5", 'meter')
+                add_to_report('Unit Sizing', 'Dimensi (PxLxT)', f"{res['Panjang']}x{res['Lebar']}x{res['Tinggi']}3.5", 'meter')
     
     if 'sizing_res' in st.session_state:
         d = st.session_state.sizing_res
