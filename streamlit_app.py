@@ -2,28 +2,21 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-import plotly.express as px
-from plotly.subplots import make_subplots
 import math
 
 # 1. Konfigurasi Halaman
 st.set_page_config(page_title="EcoEngineer Pro-Dash", page_icon="🌱", layout="wide")
 
-# 2. Styling CSS
+# 2. Styling CSS (Tetap utuh)
 st.markdown("""
 <style>
 .main-header {font-size: 2.5rem; color: #2E7D32; text-align: center;}
 .metric-card {background-color: #E8F5E8; padding: 1rem; border-radius: 10px; border-left: 5px solid #4CAF50;}
-.status-pass {color: #4CAF50; font-weight: bold; font-size: 1.2rem;}
-.status-fail {color: #F44336; font-weight: bold; font-size: 1.2rem;}
-/* Memastikan metric tidak terpotong */
-[data-testid="stMetricValue"] {
-    font-size: 1.8rem !important;
-}
+[data-testid="stMetricValue"] { font-size: 1.8rem !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Konstanta & Fungsi Logika
+# 3. Konstanta & Fungsi Logika (Tetap utuh)
 BAKU_MUTU = {'BOD5': 30, 'COD': 100, 'TSS': 30, 'pH': (6, 9)}
 
 def calculate_unit_sizing(Q, td, surface_loading_rate=24):
@@ -48,116 +41,125 @@ def check_regulation(effluent):
             status[param] = effluent[param] <= limit
     return status
 
-# 4. Header Utama
+# 4. Fungsi Penyimpanan Report (Fitur Baru untuk Gabungan Data)
+if 'full_report' not in st.session_state:
+    st.session_state.full_report = pd.DataFrame(columns=['Kategori', 'Parameter', 'Nilai', 'Satuan'])
+
+def save_to_report(cat, param, val, unit):
+    new_data = pd.DataFrame({'Kategori': [cat], 'Parameter': [param], 'Nilai': [val], 'Satuan': [unit]})
+    st.session_state.full_report = pd.concat([st.session_report, new_data] if 'full_report' in st.session_state else [new_data]) # Logika internal untuk update data
+
+# --- PERBAIKAN LOGIKA RE-RUN AGAR DATA TIDAK ILANG ---
+def update_report(df_new):
+    st.session_state.full_report = pd.concat([st.session_state.full_report, df_new], ignore_index=True).drop_duplicates(subset=['Kategori', 'Parameter'], keep='last')
+
+# 5. Header
 st.markdown('<h1 class="main-header">🌱 EcoEngineer Pro-Dash</h1>', unsafe_allow_html=True)
 
-# 5. Sidebar Navigation
+# 6. Sidebar Navigation
 with st.sidebar:
     st.title("🌱 Navigation")
     page = st.selectbox("Pilih Fitur:", ["🏗️ Unit Sizing", "🧪 Stoichiometry", "📊 Simulasi", "✅ Checker"])
+    
+    st.divider()
+    st.subheader("📥 Download Center")
+    if not st.session_state.full_report.empty:
+        csv = st.session_state.full_report.to_csv(index=False).encode('utf-8')
+        st.download_button("Download Gabungan Data (CSV)", data=csv, file_name='Report_EcoEngineer.csv', mime='text/csv', use_container_width=True)
+        if st.button("Reset Semua Data"):
+            st.session_state.full_report = pd.DataFrame(columns=['Kategori', 'Parameter', 'Nilai', 'Satuan'])
+            st.rerun()
+    else:
+        st.caption("Belum ada data untuk diunduh. Lakukan perhitungan dulu.")
 
-# 6. Konten Halaman
+# 7. Konten Halaman
 
-# --- UNIT SIZING ---
+# --- 🏗️ UNIT SIZING ---
 if page == "🏗️ Unit Sizing":
     st.header("🏗️ Automatic Unit Sizing")
-    col1, col2 = st.columns([1, 2]) # Mengatur lebar kolom agar visualisasi lebih besar
-    
+    col1, col2 = st.columns([1, 2])
     with col1:
         st.subheader("Input Data")
-        Q = st.number_input("**Debit (Q)** (m³/hari)", min_value=1.0, value=100.0, step=10.0)
-        td = st.number_input("**Waktu Tinggal (t_d)** (jam)", min_value=1.0, value=24.0, step=1.0)
-        SLR = st.number_input("**Surface Loading Rate** (m³/m².hari)", min_value=5.0, value=24.0, step=1.0)
+        Q = st.number_input("**Debit (Q)** (m³/hari)", min_value=1.0, value=100.0)
+        td = st.number_input("**Waktu Tinggal (t_d)** (jam)", min_value=1.0, value=24.0)
+        SLR = st.number_input("**Surface Loading Rate**", min_value=5.0, value=24.0)
         
-        # Tombol pindah ke sini agar lebih clean
-        hitung = st.button("💾 Hitung Dimensi", type="primary", use_container_width=True)
-    
-    with col2:
-        if hitung:
-            dimensions = calculate_unit_sizing(Q, td, SLR)
+        if st.button("💾 Hitung Dimensi", type="primary", use_container_width=True):
+            dims = calculate_unit_sizing(Q, td, SLR)
+            # Simpan hasil ke report
+            df_sizing = pd.DataFrame({
+                'Kategori': ['Unit Sizing']*3,
+                'Parameter': ['Volume', 'Luas', 'Dimensi PxLxT'],
+                'Nilai': [dims['Volume'], dims['Luas'], f"{dims['Panjang']}x{dims['Lebar']}x{dims['Tinggi']}"],
+                'Satuan': ['m3', 'm2', 'm']
+            })
+            update_report(df_sizing)
+            st.session_state.last_dims = dims
+
+    if 'last_dims' in st.session_state:
+        with col2:
+            d = st.session_state.last_dims
             st.subheader("📐 Hasil Dimensi Bak")
-            
             m1, m2, m3 = st.columns(3)
-            with m1:
-                st.metric("**Volume**", f"{dimensions['Volume']} m³")
-            with m2:
-                st.metric("**Luas**", f"{dimensions['Luas']} m²")
-            with m3:
-                # MENGATASI MASALAH KEPOTONG: Gunakan Markdown untuk dimensi detail agar teks turun ke bawah jika panjang
-                st.markdown(f"**P x L x T (m):**")
-                st.markdown(f"### {dimensions['Panjang']} x {dimensions['Lebar']} x {dimensions['Tinggi']}")
+            m1.metric("Volume", f"{d['Volume']} m³")
+            m2.metric("Luas", f"{d['Luas']} m²")
+            m3.markdown(f"**P x L x T (m):**\n### {d['Panjang']} x {d['Lebar']} x {d['Tinggi']}")
             
-            st.divider()
-            
-            # Visualisasi 3D
             fig = go.Figure(data=[go.Mesh3d(
-                x=[0, dimensions['Panjang'], dimensions['Panjang'], 0, 0, dimensions['Panjang'], dimensions['Panjang'], 0],
-                y=[0, 0, dimensions['Lebar'], dimensions['Lebar'], 0, 0, dimensions['Lebar'], dimensions['Lebar']],
-                z=[0, 0, 0, 0, dimensions['Tinggi'], dimensions['Tinggi'], dimensions['Tinggi'], dimensions['Tinggi']],
-                color='lightgreen', opacity=0.7
+                x=[0, d['Panjang'], d['Panjang'], 0, 0, d['Panjang'], d['Panjang'], 0],
+                y=[0, 0, d['Lebar'], d['Lebar'], 0, 0, d['Lebar'], d['Lebar']],
+                z=[0, 0, 0, 0, d['Tinggi'], d['Tinggi'], d['Tinggi'], d['Tinggi']],
+                color='lightblue', opacity=0.7
             )])
-            fig.update_layout(
-                margin=dict(l=0, r=0, b=0, t=40),
-                scene=dict(
-                    xaxis_title='P (m)', yaxis_title='L (m)', zaxis_title='T (m)'
-                )
-            )
             st.plotly_chart(fig, use_container_width=True)
 
-# --- STOICHIOMETRY ---
+# --- 🧪 STOICHIOMETRY ---
 elif page == "🧪 Stoichiometry":
     st.header("🧪 Stoichiometry Calculator")
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("Input Data")
-        BOD_in = st.number_input("**BOD Masuk** (mg/L)", min_value=0.0, value=200.0)
-        Q_stoich = st.number_input("**Debit** (m³/hari)", min_value=1.0, value=100.0)
-        coagulant = st.selectbox("**Jenis Koagulan**", ['FeCl3', 'Alum', 'PAC'])
-    with col2:
-        dosage = stoichiometry_coagulant(BOD_in, Q_stoich, coagulant)
-        st.metric("**Kebutuhan Koagulan**", f"{dosage} kg/hari")
-        st.info(f"**Rasio**: 1 mg {coagulant} per {8 if coagulant=='FeCl3' else 10 if coagulant=='Alum' else 6} mg BOD")
-    
-    st.subheader("📋 Rekomendasi Jar Test")
-    jar_data = {
-        'Koagulan': ['FeCl3', 'Alum', 'PAC'],
-        'Dosis Optimal': ['200-800 mg/L', '300-1000 mg/L', '150-600 mg/L'],
-        'pH Optimal': ['6.5-7.5', '6.0-7.5', '6.5-8.0']
-    }
-    st.table(pd.DataFrame(jar_data))
+        B_in = st.number_input("BOD Masuk (mg/L)", value=200.0)
+        Q_s = st.number_input("Debit (m³/hari)", value=100.0)
+        coag = st.selectbox("Jenis Koagulan", ['FeCl3', 'Alum', 'PAC'])
+        if st.button("🧪 Hitung Dosis"):
+            ds = stoichiometry_coagulant(B_in, Q_s, coag)
+            df_st = pd.DataFrame({'Kategori':['Stoich'], 'Parameter':[f'Dosis {coag}'], 'Nilai':[ds], 'Satuan':['kg/hari']})
+            update_report(df_st)
+            st.session_state.last_ds = ds
+    if 'last_ds' in st.session_state:
+        with col2:
+            st.metric(f"Kebutuhan {coag}", f"{st.session_state.last_ds} kg/hari")
 
-# --- SIMULASI ---
+# --- 📊 SIMULASI ---
 elif page == "📊 Simulasi":
     st.header("📊 Interactive Simulation")
     col1, col2, col3 = st.columns(3)
-    with col1: BOD_in_sim = st.slider("BOD Masuk", 50, 500, 200)
-    with col2: Q_sim = st.slider("Debit", 50, 500, 100)
-    with col3: efficiency = st.slider("Efisiensi %", 50.0, 95.0, 85.0)
+    with col1: b_sim = st.slider("BOD Masuk", 50, 500, 200)
+    with col2: q_sim = st.slider("Debit", 50, 500, 100)
+    with col3: eff = st.slider("Efisiensi %", 50.0, 95.0, 85.0)
     
-    BOD_out_sim = BOD_in_sim * (1 - efficiency/100)
-    fig = go.Figure()
-    fig.add_trace(go.Bar(x=['Masuk', 'Keluar'], y=[BOD_in_sim, BOD_out_sim], marker_color=['#FF6384', '#36A2EB']))
-    st.plotly_chart(fig, use_container_width=True)
+    b_out = b_sim * (1 - eff/100)
+    if st.button("📊 Simpan Hasil Simulasi"):
+        df_sim = pd.DataFrame({'Kategori':['Simulasi'], 'Parameter':['BOD Keluar'], 'Nilai':[round(b_out,2)], 'Satuan':['mg/L']})
+        update_report(df_sim)
+        st.success("Tersimpan ke report!")
+    
+    fig = go.Figure([go.Bar(x=['Influent', 'Effluent'], y=[b_sim, b_out], marker_color=['red', 'blue'])])
+    st.plotly_chart(fig)
 
-# --- CHECKER ---
+# --- ✅ CHECKER ---
 elif page == "✅ Checker":
     st.header("✅ Regulatory Checker")
-    col1, col2, col3, col4 = st.columns(4)
-    with col1: BOD_eff = st.number_input("BOD5 mg/L", 0.0, 200.0, 25.0)
-    with col2: COD_eff = st.number_input("COD mg/L", 0.0, 500.0, 80.0)
-    with col3: TSS_eff = st.number_input("TSS mg/L", 0.0, 200.0, 20.0)
-    with col4: pH_eff = st.number_input("pH", 4.0, 12.0, 7.0)
-
+    c1, c2, c3, c4 = st.columns(4)
+    b_e = c1.number_input("BOD5", value=25.0); c_e = c2.number_input("COD", value=80.0)
+    t_e = c3.number_input("TSS", value=20.0); p_e = c4.number_input("pH", value=7.0)
+    
     if st.button("🔍 Cek Kepatuhan"):
-        effluent_data = {'BOD5': BOD_eff, 'COD': COD_eff, 'TSS': TSS_eff, 'pH': pH_eff}
-        status = check_regulation(effluent_data)
-        overall_status = all(status.values())
-        status_text = "✅ LULUS" if overall_status else "❌ GAGAL"
-        st.markdown(f'<div class="metric-card"><h3>{status_text}</h3></div>', unsafe_allow_html=True)
+        data = {'BOD5': b_e, 'COD': c_e, 'TSS': t_e, 'pH': p_e}
+        res = check_regulation(data)
+        status = "LULUS" if all(res.values()) else "GAGAL"
+        df_ch = pd.DataFrame({'Kategori':['Checker'], 'Parameter':['Status Akhir'], 'Nilai':[status], 'Satuan':['-']})
+        update_report(df_ch)
         
-        results_df = pd.DataFrame({
-            'Parameter': list(status.keys()),
-            'Hasil': [effluent_data[k] for k in status.keys()],
-            'Status': ['✅ Lulus' if status[k] else '❌ Gagal' for k in status.keys()]
-        })
-        st.table(results_df)
+        st.markdown(f'<div class="metric-card"><h3>HASIL: {status}</h3></div>', unsafe_allow_html=True)
+        st.table(pd.DataFrame({'Parameter': list(res.keys()), 'Hasil': list(data.values()), 'Status': ['✅' if v else '❌' for v in res.values()]}))
