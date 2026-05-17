@@ -21,10 +21,10 @@ def load_lottieurl(url: str):
         return None
     return None
 
-# Memuat animasi Lottie yang berbeda untuk tiap halaman
-lottie_home = load_lottieurl("https://lottie.host/549c44db-e204-4bda-be9f-86f37efbe065/wP8pMWeE6A.json") # Animasi Ekologi/Pabrik
-lottie_form = load_lottieurl("https://lottie.host/409d6f6a-ce07-4286-9a25-9b24765ff0f5/H6q8S0vXzH.json") # Animasi Input/Data
-lottie_about = load_lottieurl("https://lottie.host/51e3db3d-ef04-45fb-bc76-efdbb0cae5eb/tqNUnVjY02.json") # Animasi Sertifikat/Regulasi
+# Memuat animasi Lottie
+lottie_home = load_lottieurl("https://lottie.host/549c44db-e204-4bda-be9f-86f37efbe065/wP8pMWeE6A.json") # Ekologi/Pabrik
+lottie_form = load_lottieurl("https://lottie.host/409d6f6a-ce07-4286-9a25-9b24765ff0f5/H6q8S0vXzH.json") # Input/Data
+lottie_about = load_lottieurl("https://lottie.host/51e3db3d-ef04-45fb-bc76-efdbb0cae5eb/tqNUnVjY02.json") # Sertifikat/Regulasi
 
 # 3. DATABASE DAN REKOMENDASI WADAH OTOMATIS
 B3_DATABASE = {
@@ -62,15 +62,25 @@ if "b3_db" not in st.session_state:
         "Rekomendasi Wadah", "Berat (Kg)", "Tanggal Masuk", "Batas Hari", "Sisa Hari", "Status"
     ])
 
-# 5. HEADER UTAMA APLIKASI
-st.title("☣️ Industrial Hazardous Waste Tracker")
-st.markdown("---")
+# ==================== SIDEBAR (NAVIGASI SAMPING) ====================
+with st.sidebar:
+    st.title("☣️ B3 Tracker")
+    st.markdown("Sistem Kepatuhan TPS")
+    st.markdown("---")
+    
+    # Komponen Radio Button untuk Navigasi Samping
+    menu_pilihan = st.radio(
+        "Pilih Menu Navigasi:",
+        ["🏠 Beranda Utama", "📥 Input & Hasil Data", "ℹ️ Tentang & Regulasi"]
+    )
+    
+    st.markdown("---")
+    st.caption("Aplikasi Pemantauan Digital v1.1")
 
-# 6. PEMBUATAN MENU NAVIGASI (3 TABS)
-tab1, tab2, tab3 = st.tabs(["🏠 Beranda", "📥 Input & Hasil Data", "ℹ️ Tentang Aplikasi & Regulasi"])
+# ==================== LOGIKA HALAMAN UTAMA ====================
 
-# ==================== MENU 1: BERANDA ====================
-with tab1:
+# 📑 MENU 1: BERANDA UTAMA
+if menu_pilihan == "🏠 Beranda Utama":
     col_h1, col_h2 = st.columns([2, 1])
     with col_h1:
         st.header("Selamat Datang di Sistem Pemantauan Limbah B3")
@@ -87,32 +97,30 @@ with tab1:
         if lottie_home:
             st_lottie(lottie_home, height=250, key="home_anim")
 
-# ==================== MENU 2: INPUT & HASIL DATA ====================
-with tab2:
-    st.header("📝 Manajemen Inventaris TPS Limbah B3")
+# 📑 MENU 2: INPUT & HASIL DATA
+elif menu_pilihan == "📥 Input & Hasil Data":
+    st.header("📥 Manajemen Inventaris TPS Limbah B3")
     
     col_f1, col_f2 = st.columns([1, 2])
     
-    # Kiri: Form Input
+    # Sisi Kiri Halaman Utama: Form Input
     with col_f1:
-        st.subheader("Form Input Limbah")
+        st.subheader("Entri Limbah Masuk")
         if lottie_form:
             st_lottie(lottie_form, height=120, key="form_anim")
             
         with st.form(key="form_b3", clear_on_submit=True):
             jenis_limbah = st.selectbox("Pilih Jenis Limbah B3", list(B3_DATABASE.keys()))
             
-            # Tampilan Otomatis Rekomendasi Wadah dan Simbol
             simbol_oto = B3_DATABASE[jenis_limbah]["simbol"]
             wadah_oto = B3_DATABASE[jenis_limbah]["wadah_rekomendasi"]
             
-            st.caption(f"**Karakteristik:** {simbol_oto}")
-            st.caption(f"**Rekomendasi Wadah:** {wadah_oto}")
+            st.info(f"**Karakteristik:** {simbol_oto}\n\n**Rekomendasi Wadah:** {wadah_oto}")
             
             berat = st.number_input("Berat Limbah (Kg)", min_value=1.0, step=10.0)
             tgl_masuk = st.date_input("Tanggal Masuk TPS", date.today())
             
-            submit_btn = st.form_submit_button(label="Simpan ke Sistem")
+            submit_btn = st.form_submit_button(label="Simpan Data")
             
         if submit_btn:
             id_limbah = f"B3-{datetime.now().strftime('%M%S')}"
@@ -140,14 +148,13 @@ with tab2:
             st.session_state.b3_db = pd.concat([st.session_state.b3_db, new_data], ignore_index=True)
             st.success("Data Berhasil Disimpan!")
 
-    # Kanan: Hasil Tabel & Tombol Download
+    # Sisi Kanan Halaman Utama: Hasil Tabel & Tombol Download
     with col_f2:
         st.subheader("Tabel Pantauan Real-Time TPS")
         
         if st.session_state.b3_db.empty:
             st.info("Belum ada data masuk. Silakan isi form di sebelah kiri.")
         else:
-            # Fungsi Mewarnai Baris Tabel
             def color_status(val):
                 if "KRITIS" in str(val):
                     return "background-color: #ffcccc; color: black; font-weight: bold;"
@@ -160,16 +167,13 @@ with tab2:
             
             # FITUR DOWNLOAD DATA
             st.markdown("### 📥 Ekspor Laporan Logbook")
-            
-            # Konversi dataframe ke CSV
             csv_data = st.session_state.b3_db.to_csv(index=False).encode('utf-8')
             
             st.download_button(
-                label="📥 Unduh Data Logbook (Format .CSV)",
+                label="📥 Unduh Data Logbook (.CSV)",
                 data=csv_data,
                 file_name=f"Logbook_Limbah_B3_{date.today()}.csv",
-                mime="text/csv",
-                help="Klik di sini untuk mengunduh laporan tabel di atas untuk kebutuhan Microsoft Excel atau laporan audit."
+                mime="text/csv"
             )
             
             if st.button("Kosongkan Semua Data"):
@@ -179,12 +183,11 @@ with tab2:
                 ])
                 st.rerun()
 
-# ==================== MENU 3: TENTANG & REGULASI ====================
-with tab3:
+# 📑 MENU 3: TENTANG & REGULASI
+elif menu_pilihan == "ℹ️ Tentang & Regulasi":
     col_a1, col_a2 = st.columns([2, 1])
     with col_a1:
         st.header("Informasi Pengembang & Acuan Baku Mutu")
-        
         st.markdown("""
         ### 📚 Regulasi / Acuan Baku Mutu Utama
         Sistem penentuan karakteristik piktogram bahaya, tata cara pengemasan, dan batasan masa penyimpanan di dalam aplikasi ini dikembangkan dengan mengacu ketat pada hukum positif di Indonesia:
