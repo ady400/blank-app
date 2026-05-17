@@ -83,6 +83,9 @@ with st.sidebar:
 if menu_pilihan == "🏠 Beranda Utama":
     col_h1, col_h2 = st.columns([2, 1])
     with col_h1:
+        if lottie_home:
+            st_lottie(lottie_home, speed=1, loop=True, quality="high", height=150)
+    with col_h2:
         st.header("Selamat Datang di Sistem Pemantauan Limbah B3")
         st.markdown("""
         ### Kenapa Aplikasi Ini Dibuat?
@@ -92,11 +95,7 @@ if menu_pilihan == "🏠 Beranda Utama":
         *   **Mencegah Pelanggaran Hukum:** Memberikan sistem peringatan dini sebelum masa simpan legal limbah di Tempat Penyimpanan Sementara (TPS) berakhir.
         *   **Standardisasi Pengemasan:** Menyediakan rekomendasi wadah penyimpanan yang tepat secara otomatis demi keselamatan kerja.
         *   **Transparansi Audit:** Mempermudah pencatatan logbook yang rapi, terstruktur, dan siap pakai untuk keperluan audit lingkungan internal maupun eksternal.
-        """)
-    with col_h2:
-        if lottie_home:
-            st_lottie(lottie_home, speed=1, loop=True, quality="high", height=150)
-            
+        """)    
 # 📑 MENU 2: INPUT & HASIL DATA
 elif menu_pilihan == "📥 Input & Hasil Data":
     st.header("📥 Manajemen Inventaris TPS Limbah B3")
