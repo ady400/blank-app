@@ -82,15 +82,31 @@ with st.sidebar:
 # 📑 MENU 1: BERANDA UTAMA
 if menu_pilihan == "🏠 Beranda Utama":
     
-    # 1. Tampilkan animasi Lottie terlebih dahulu di bagian atas
+    # 1. Tampilkan animasi Lottie di bagian paling atas
     if lottie_home:
         st_lottie(lottie_home, speed=1, loop=True, quality="high", height=200)
     
-    st.markdown("---") # Opsional: Tambahkan garis pembatas tipis agar lebih rapi
+    st.markdown("<br>", unsafe_allow_html=True) # Memberi sedikit jarak vertikal
     
-    # 2. Tampilkan teks langsung di bawahnya tanpa menggunakan 'with col_h2'
-    st.header("Selamat Datang di Sistem Pemantauan Limbah B3")
+    # 2. Judul dengan Background CSS kustom
+    st.markdown(
+        """
+        <div style="
+            background-color: #1e4620; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 25px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        ">
+            <h1 style="color: white; margin: 0; font-size: 28px; text-align: center;">
+                🌿 Selamat Datang di Sistem Pemantauan Limbah B3
+            </h1>
+        </div>
+        """, 
+        unsafe_allow_html=True
+    )
     
+    # 3. Tampilkan teks penjelasan di bawahnya
     st.markdown("""
     ### Kenapa Aplikasi Ini Dibuat?
     Pengelolaan Limbah Bahan Berbahaya dan Beracun (B3) merupakan salah satu aspek paling krusial sekaligus sensitif dalam operasional industri modern.
@@ -100,6 +116,7 @@ if menu_pilihan == "🏠 Beranda Utama":
     * **Standardisasi Pengemasan:** Menyediakan rekomendasi wadah penyimpanan yang tepat secara otomatis demi keselamatan kerja.
     * **Transparansi Audit:** Mempermudah pencatatan logbook yang rapi, terstruktur, dan siap pakai untuk keperluan audit lingkungan internal maupun eksternal.
     """)
+    
 # 📑 MENU 2: INPUT & HASIL DATA
 elif menu_pilihan == "📥 Input & Hasil Data":
     st.header("📥 Manajemen Inventaris TPS Limbah B3")
