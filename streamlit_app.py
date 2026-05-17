@@ -81,21 +81,25 @@ with st.sidebar:
 
 # 📑 MENU 1: BERANDA UTAMA
 if menu_pilihan == "🏠 Beranda Utama":
-    col_h1, col_h2 = st.columns([2, 1])
-    with col_h1:
-        if lottie_home:
-            st_lottie(lottie_home, speed=1, loop=True, quality="high", height=150)
-    with col_h2:
-        st.header("Selamat Datang di Sistem Pemantauan Limbah B3")
-        st.markdown("""
-        ### Kenapa Aplikasi Ini Dibuat?
-        Pengelolaan Limbah Bahan Berbahaya dan Beracun (B3) merupakan salah satu aspek paling krusial sekaligus sensitif dalam operasional industri modern. Kegagalan dalam melacak masa simpan limbah dapat memicu **sanksi hukum, denda finansial, hingga pencemaran lingkungan serius**.
-        
-        Aplikasi ini dikembangkan sebagai solusi digital berbasis data untuk:
-        *   **Mencegah Pelanggaran Hukum:** Memberikan sistem peringatan dini sebelum masa simpan legal limbah di Tempat Penyimpanan Sementara (TPS) berakhir.
-        *   **Standardisasi Pengemasan:** Menyediakan rekomendasi wadah penyimpanan yang tepat secara otomatis demi keselamatan kerja.
-        *   **Transparansi Audit:** Mempermudah pencatatan logbook yang rapi, terstruktur, dan siap pakai untuk keperluan audit lingkungan internal maupun eksternal.
-        """)    
+    
+    # 1. Tampilkan animasi Lottie terlebih dahulu di bagian atas
+    if lottie_home:
+        st_lottie(lottie_home, speed=1, loop=True, quality="high", height=200)
+    
+    st.markdown("---") # Opsional: Tambahkan garis pembatas tipis agar lebih rapi
+    
+    # 2. Tampilkan teks langsung di bawahnya tanpa menggunakan 'with col_h2'
+    st.header("Selamat Datang di Sistem Pemantauan Limbah B3")
+    
+    st.markdown("""
+    ### Kenapa Aplikasi Ini Dibuat?
+    Pengelolaan Limbah Bahan Berbahaya dan Beracun (B3) merupakan salah satu aspek paling krusial sekaligus sensitif dalam operasional industri modern.
+    
+    Aplikasi ini dikembangkan sebagai solusi digital berbasis data untuk:
+    * **Mencegah Pelanggaran Hukum:** Memberikan sistem peringatan dini sebelum masa simpan legal limbah di Tempat Penyimpanan Sementara (TPS) berakhir.
+    * **Standardisasi Pengemasan:** Menyediakan rekomendasi wadah penyimpanan yang tepat secara otomatis demi keselamatan kerja.
+    * **Transparansi Audit:** Mempermudah pencatatan logbook yang rapi, terstruktur, dan siap pakai untuk keperluan audit lingkungan internal maupun eksternal.
+    """)
 # 📑 MENU 2: INPUT & HASIL DATA
 elif menu_pilihan == "📥 Input & Hasil Data":
     st.header("📥 Manajemen Inventaris TPS Limbah B3")
