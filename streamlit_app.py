@@ -243,11 +243,9 @@ elif menu_pilihan == "ℹ️ Tentang & Regulasi":
         2.  **Peraturan Menteri LHK No. 6 Tahun 2021** tentang *Tata Cara dan Persyaratan Pengelolaan Limbah Bahan Berbahaya dan Beracun*.
         3.  **Sistem Harmonisasi Global (GHS - Globally Harmonized System)** untuk standardisasi simbol piktogram bahaya zat kimia.
 
-        ### 💻 Profil Pengembang
-        Aplikasi purwarupa (*prototype*) ini dirancang dan dibangun oleh pengembang yang berfokus pada integrasi **Teknologi Informasi** di bidang **Teknik Lingkungan & Keselamatan Kerja (K3)**. 
-        
-        *   **Tujuan Proyek:** Menyediakan alat bantu digital yang intuitif bagi operator lapangan dan manajemen industri dalam memitigasi risiko hukum dan operasional terkait limbah beracun.
-        """)
+        ### 👥 Profil Pengembang
+       Kelompok:
+       Versi: 1.1
     with col_a2:
         if lottie_about:
             st_lottie(lottie_about, height=250, key="about_anim")
