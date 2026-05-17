@@ -22,7 +22,7 @@ def load_lottieurl(url: str):
     return None
 
 # Memuat animasi Lottie
-lottie_home = load_lottieurl("https://lottie.host/549c44db-e204-4bda-be9f-86f37efbe065/wP8pMWeE6A.json") # Ekologi/Pabrik
+lottie_home = load_lottieurl("https://lottie.host/947d937e-1b76-43a0-b786-d255c0ee1e74/stE5uwmVhW.json") 
 lottie_form = load_lottieurl("https://lottie.host/409d6f6a-ce07-4286-9a25-9b24765ff0f5/H6q8S0vXzH.json") # Input/Data
 lottie_about = load_lottieurl("https://lottie.host/51e3db3d-ef04-45fb-bc76-efdbb0cae5eb/tqNUnVjY02.json") # Sertifikat/Regulasi
 
@@ -95,8 +95,8 @@ if menu_pilihan == "🏠 Beranda Utama":
         """)
     with col_h2:
         if lottie_home:
-            st_lottie(lottie_home, height=250, key="home_anim")
-
+            st_lottie(lottie_home, speed=1, loop=True, quality="high", height=150)
+            
 # 📑 MENU 2: INPUT & HASIL DATA
 elif menu_pilihan == "📥 Input & Hasil Data":
     st.header("📥 Manajemen Inventaris TPS Limbah B3")
