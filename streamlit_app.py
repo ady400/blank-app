@@ -6,7 +6,7 @@ from streamlit_lottie import st_lottie
 
 # 1. PENGATURAN HALAMAN
 st.set_page_config(
-    page_title="B3 Waste Tracker Pro",
+    page_title="Storify Waste",
     page_icon="☣️",
     layout="wide"
 )
@@ -64,7 +64,7 @@ if "b3_db" not in st.session_state:
 
 # ==================== SIDEBAR (NAVIGASI SAMPING) ====================
 with st.sidebar:
-    st.title("☣️ B3 Tracker")
+    st.title("☣️ Storify Waste")
     st.markdown("Sistem Kepatuhan TPS")
     st.markdown("---")
     
