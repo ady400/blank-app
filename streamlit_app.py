@@ -233,19 +233,84 @@ elif menu_pilihan == "📥 Input & Hasil Data":
 
 # 📑 MENU 3: TENTANG & REGULASI
 elif menu_pilihan == "ℹ️ Tentang & Regulasi":
+    
+    # 1. Tampilkan animasi Lottie di bagian paling atas
+    if lottie_about:
+        st_lottie(lottie_about, speed=1, loop=True, quality="high", height=180, key="about_menu_top")
+        
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # 2. Judul Halaman dengan Background Kustom 
+    st.markdown(
+        """
+        <div style="
+            background-color: #7f8c8d; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 30px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+        ">
+            <h2 style="color: white; margin: 0; font-size: 26px; text-align: center;">
+                ℹ️ Informasi Pengembang & Acuan Regulasi
+            </h2>
+        </div>
+        """, 
+        unsafe_allow_html=True
+    )
+    
+    # 3. Pembagian Konten (Kiri: Kelompok & Regulasi, Kanan: Info Tambahan)
     col_a1, col_a2 = st.columns([2, 1])
+    
     with col_a1:
-        st.header("Informasi Pengembang & Acuan Baku Mutu")
+        # ---- SEKSI TIM / KELOMPOK ----
+        st.subheader("👥 Tim Pengembang (Kelompok)")
+        
+        # Contoh susunan 3 anggota kelompok berdampingan menggunakan kolom
+        col_m1, col_m2, col_m3 = st.columns(3)
+        
+        with col_m1:
+            st.markdown("""
+            <div style="background-color: #f8f9fa; padding: 15px; border-left: 5px solid #1e4620; border-radius: 4px;">
+                <strong>Nama Anggota 1</strong><br>
+                <span style="color: gray; font-size: 14px;">NIM. 123456789</span><br>
+                <small>Perancang Sistem</small>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        with col_m2:
+            st.markdown("""
+            <div style="background-color: #f8f9fa; padding: 15px; border-left: 5px solid #2c3e50; border-radius: 4px;">
+                <strong>Nama Anggota 2</strong><br>
+                <span style="color: gray; font-size: 14px;">NIM. 987654321</span><br>
+                <small>Programmer Python</small>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        with col_m3:
+            st.markdown("""
+            <div style="background-color: #f8f9fa; padding: 15px; border-left: 5px solid #7f8c8d; border-radius: 4px;">
+                <strong>Nama Anggota 3</strong><br>
+                <span style="color: gray; font-size: 14px;">NIM. 564738291</span><br>
+                <small>Analis Regulasi</small>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # ---- SEKSI REGULASI ----
+        st.subheader("📚 Acuan Baku Mutu & Regulasi")
         st.markdown("""
-        ### 📚 Regulasi / Acuan Baku Mutu Utama
-        Sistem penentuan karakteristik piktogram bahaya, tata cara pengemasan, dan batasan masa penyimpanan di dalam aplikasi ini dikembangkan dengan mengacu ketat pada hukum positif di Indonesia:
-        1.  **Peraturan Pemerintah (PP) No. 22 Tahun 2021** tentang *Penyelenggaraan Perlindungan dan Pengelolaan Lingkungan Hidup* (Lampiran IX mengenai Pengelolaan Limbah B3).
-        2.  **Peraturan Menteri LHK No. 6 Tahun 2021** tentang *Tata Cara dan Persyaratan Pengelolaan Limbah Bahan Berbahaya dan Beracun*.
-        3.  **Sistem Harmonisasi Global (GHS - Globally Harmonized System)** untuk standardisasi simbol piktogram bahaya zat kimia.
+        Sistem klasifikasi otomatis piktogram bahaya, rekomendasi wadah, serta ambang batas masa simpan dalam aplikasi ini dirancang berdasarkan hukum positif Indonesia:
+        1. **Peraturan Pemerintah (PP) No. 22 Tahun 2021** tentang *Penyelenggaraan Perlindungan dan Pengelolaan Lingkungan Hidup* (Lampiran IX khusus Pengelolaan Limbah B3).
+        2. **Peraturan Menteri LHK No. 6 Tahun 2021** tentang *Tata Cara dan Persyaratan Pengelolaan Limbah Bahan Berbahaya dan Beracun*.
+        3. **Sistem Harmonisasi Global (GHS - Globally Harmonized System)** untuk standardisasi piktogram bahaya internasional.
+        """)
 
-        ### 👥 Profil Pengembang
-       Kelompok:
-       Versi: 1.1
     with col_a2:
-        if lottie_about:
-            st_lottie(lottie_about, height=250, key="about_anim")
+        st.subheader("💻 Detail Aplikasi")
+        st.info("""
+        * **Nama Aplikasi:** B3 Waste Tracker Pro
+        * **Versi:** 1.2 (Dashboard Update)
+        * **Framework:** Streamlit Python
+        * **Tujuan Proyek:** Tugas Besar / Proyek Digitalisasi Pengelolaan Limbah Industri di TPS.
+        """)
