@@ -119,15 +119,37 @@ if menu_pilihan == "🏠 Beranda Utama":
     
 # 📑 MENU 2: INPUT & HASIL DATA
 elif menu_pilihan == "📥 Input & Hasil Data":
-    st.header("📥 Manajemen Inventaris TPS Limbah B3")
     
+    # 1. Tampilkan animasi Lottie di bagian paling atas halaman menu 2
+    if lottie_form:
+        st_lottie(lottie_form, speed=1, loop=True, quality="high", height=180, key="form_menu_top")
+    
+    st.markdown("<br>", unsafe_allow_html=True) # Jarak vertikal halus
+    
+    # 2. Judul Halaman dengan Background Kustom yang Menarik
+    st.markdown(
+        """
+        <div style="
+            background-color: #2c3e50; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 30px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+        ">
+            <h2 style="color: white; margin: 0; font-size: 26px; text-align: center; font-family: 'Source Sans Pro', sans-serif;">
+                📥 Manajemen Inventaris & Logbook Digital TPS B3
+            </h2>
+        </div>
+        """, 
+        unsafe_allow_html=True
+    )
+    
+    # 3. Pembagian Kolom untuk Form dan Tabel di bawah Judul Utama
     col_f1, col_f2 = st.columns([1, 2])
     
-    # Sisi Kiri Halaman Utama: Form Input
+    # Sisi Kiri: Form Input
     with col_f1:
-        st.subheader("Entri Limbah Masuk")
-        if lottie_form:
-            st_lottie(lottie_form, height=120, key="form_anim")
+        st.subheader("📝 Entri Limbah Masuk")
             
         with st.form(key="form_b3", clear_on_submit=True):
             jenis_limbah = st.selectbox("Pilih Jenis Limbah B3", list(B3_DATABASE.keys()))
@@ -135,12 +157,13 @@ elif menu_pilihan == "📥 Input & Hasil Data":
             simbol_oto = B3_DATABASE[jenis_limbah]["simbol"]
             wadah_oto = B3_DATABASE[jenis_limbah]["wadah_rekomendasi"]
             
+            # Info box otomatis yang rapi di dalam form
             st.info(f"**Karakteristik:** {simbol_oto}\n\n**Rekomendasi Wadah:** {wadah_oto}")
             
             berat = st.number_input("Berat Limbah (Kg)", min_value=1.0, step=10.0)
             tgl_masuk = st.date_input("Tanggal Masuk TPS", date.today())
             
-            submit_btn = st.form_submit_button(label="Simpan Data")
+            submit_btn = st.form_submit_button(label="Simpan ke Logbook")
             
         if submit_btn:
             id_limbah = f"B3-{datetime.now().strftime('%M%S')}"
@@ -166,15 +189,17 @@ elif menu_pilihan == "📥 Input & Hasil Data":
             }])
             
             st.session_state.b3_db = pd.concat([st.session_state.b3_db, new_data], ignore_index=True)
-            st.success("Data Berhasil Disimpan!")
+            st.success("Data Berhasil Disimpan ke TPS!")
+            st.rerun()
 
-    # Sisi Kanan Halaman Utama: Hasil Tabel & Tombol Download
+    # Sisi Kanan: Hasil Tabel & Tombol Download
     with col_f2:
-        st.subheader("Tabel Pantauan Real-Time TPS")
+        st.subheader("📊 Tabel Pantauan Real-Time TPS")
         
         if st.session_state.b3_db.empty:
-            st.info("Belum ada data masuk. Silakan isi form di sebelah kiri.")
+            st.info("Belum ada data masuk. Silakan isi form entri di sebelah kiri.")
         else:
+            # Fungsi pewarnaan status tabel
             def color_status(val):
                 if "KRITIS" in str(val):
                     return "background-color: #ffcccc; color: black; font-weight: bold;"
@@ -186,17 +211,20 @@ elif menu_pilihan == "📥 Input & Hasil Data":
             st.dataframe(df_styled, use_container_width=True)
             
             # FITUR DOWNLOAD DATA
-            st.markdown("### 📥 Ekspor Laporan Logbook")
+            st.markdown("---")
+            st.markdown("### 📥 Ekspor Laporan Resmi")
             csv_data = st.session_state.b3_db.to_csv(index=False).encode('utf-8')
             
             st.download_button(
                 label="📥 Unduh Data Logbook (.CSV)",
                 data=csv_data,
                 file_name=f"Logbook_Limbah_B3_{date.today()}.csv",
-                mime="text/csv"
+                mime="text/csv",
+                use_container_width=True
             )
             
-            if st.button("Kosongkan Semua Data"):
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("Kosongkan Semua Data TPS", use_container_width=True):
                 st.session_state.b3_db = pd.DataFrame(columns=[
                     "ID Limbah", "Jenis Limbah", "Karakteristik / Simbol", 
                     "Rekomendasi Wadah", "Berat (Kg)", "Tanggal Masuk", "Batas Hari", "Sisa Hari", "Status"
