@@ -1,316 +1,314 @@
-import streamlit as st
+import time
+import numpy as np
 import pandas as pd
-from datetime import datetime, date
+import streamlit as st
+import io
 import requests
+import plotly.graph_objects as go
 from streamlit_lottie import st_lottie
 
-# 1. PENGATURAN HALAMAN
-st.set_page_config(
-    page_title="Storify Waste",
-    page_icon="☣️",
-    layout="wide"
-)
-
-# 2. FUNGSI MEMUAT ANIMASI LOTTIE
-def load_lottieurl(url: str):
+# Fungsi untuk memuat animasi lottie dari URL dengan pengaman try-except
+def load_lottie_url(url):
     try:
         r = requests.get(url, timeout=5)
-        if r.status_code == 200:
-            return r.json()
+        if r.status_code != 200:
+            return None
+        return r.json()
     except:
         return None
-    return None
 
-# Memuat animasi Lottie
-lottie_home = load_lottieurl("https://lottie.host/947d937e-1b76-43a0-b786-d255c0ee1e74/stE5uwmVhW.json") 
-lottie_form = load_lottieurl("https://lottie.host/409d6f6a-ce07-4286-9a25-9b24765ff0f5/H6q8S0vXzH.json") # Input/Data
-lottie_about = load_lottieurl("https://lottie.host/51e3db3d-ef04-45fb-bc76-efdbb0cae5eb/tqNUnVjY02.json") # Sertifikat/Regulasi
+# Memuat Lottie animations
+lottie_beranda = load_lottie_url("https://lottie.host/947d937e-1b76-43a0-b786-d255c0ee1e74/stE5uwmVhW.json")
+lottie_lab = load_lottie_url("https://lottie.host/ad0ad4a2-3e19-4bc4-a8f8-6447dbc72c73/s5hNdaq1uX.json")
+lottie_simulasi = load_lottie_url("https://lottie.host/452e722c-e5f7-4a5a-bdaa-4f46c93a4ee6/FlkgyfRxKz.json")
+lottie_proses = load_lottie_url("https://lottie.host/83a75fcc-2836-4020-ba68-10b9e0f7aa75/RTuEA9yHNB.json")
+lottie_edukasi = load_lottie_url("https://lottie.host/30b3a6b0-a898-4862-a498-5600b93ee6a7/R9YyJLBYSA.json")
+lottie_laboratorium = load_lottie_url("https://lottie.host/512b24b7-72c0-4868-93cf-641162ab8ce5/y2TUFxINa1.json")
+lottie_interaktif = load_lottie_url("https://lottie.host/05ce74d8-a548-48b4-9dd0-04ec7c20bec1/gKJaJSYHw1.json")
+lottie_sidebar = load_lottie_url("https://lottie.host/46d5d5e6-71ac-47f0-b042-9d7bece4d120/KUFhym6hHY.json")
+lottie_tentang = load_lottie_url("https://lottie.host/2ca14505-599f-44fc-9516-fa2213084686/vW634tXhdC.json")
 
-# 3. DATABASE DAN REKOMENDASI WADAH OTOMATIS
-B3_DATABASE = {
-    "Sludge IPAL / Elektroplating": {
-        "simbol": "☣️ Beracun (Toxic)", 
-        "masa_simpan": 90,
-        "wadah_rekomendasi": "Drum Plastik (HDPE Drum) atau Jumbo Bag dengan pelapis dalam (inner liner) untuk mencegah kebocoran material basah."
-    },
-    "Oli Bekas / Solvent": {
-        "simbol": "🔥 Mudah Menyala (Flammable)", 
-        "masa_simpan": 180,
-        "wadah_rekomendasi": "Drum Baja (Steel Drum) yang dilengkapi dengan seal penutup rapat untuk menahan tekanan uap cair."
-    },
-    "Aki Bekas / Asam-Asaman": {
-        "simbol": "🧪 Korosif (Corrosive)", 
-        "masa_simpan": 365,
-        "wadah_rekomendasi": "Box Container Plastic / Palet Plastik HDPE khusus yang tahan terhadap korosi asam dan zat kimia tajam."
-    },
-    "Kain Majun Terkontaminasi": {
-        "simbol": "⚠️ Bahaya Terhadap Kesehatan", 
-        "masa_simpan": 180,
-        "wadah_rekomendasi": "Drum Baja (Steel Drum) atau Container Tertutup untuk meminimalisir risiko penyebaran kontaminan ke udara."
-    },
-    "Fly Ash / Bottom Ash": {
-        "simbol": "☣️ Beracun (Toxic)", 
-        "masa_simpan": 365,
-        "wadah_rekomendasi": "Jumbo Bag tipe tertutup rapat (Woven PP dengan liner) untuk menghindari emisi debu halus ke lingkungan sekitar."
-    }
-}
+# Konfigurasi halaman
+st.set_page_config(page_title="Limbah Track", page_icon="♻️", layout="wide")
 
-# 4. INITIALIZATION SESSION STATE (Simulasi Database)
-if "b3_db" not in st.session_state:
-    st.session_state.b3_db = pd.DataFrame(columns=[
-        "ID Limbah", "Jenis Limbah", "Karakteristik / Simbol", 
-        "Rekomendasi Wadah", "Berat (Kg)", "Tanggal Masuk", "Batas Hari", "Sisa Hari", "Status"
-    ])
-
-# ==================== SIDEBAR (NAVIGASI SAMPING) ====================
+# Sidebar
 with st.sidebar:
-    st.title("☣️ Storify Waste")
-    st.markdown("Sistem Kepatuhan TPS")
+    if lottie_sidebar:
+        st_lottie(lottie_sidebar, speed=1, quality="high", height=150, key="sidebar_anim")
+    st.title("♻️ Limbah Track")
+    st.markdown("Belajar & Simulasi Pengolahan Limbah Industri 🌍")
     st.markdown("---")
-    
-    # Komponen Radio Button untuk Navigasi Samping
-    menu_pilihan = st.radio(
-        "Pilih Menu Navigasi:",
-        ["🏠 Beranda Utama", "📥 Input & Hasil Data", "ℹ️ Tentang & Regulasi"]
-    )
-    
+    menu = st.radio("Navigasi", ["🏠 Beranda", "⚙️ Proses", "🧪 Uji Lab", "🧩 Konsentrasi", "ℹ️ Tentang"])
     st.markdown("---")
-    st.caption("Aplikasi Pemantauan Digital v1.1")
+    st.caption("© 2026 Kelompok 6 - 1F PLI AKA")
 
-# ==================== LOGIKA HALAMAN UTAMA ====================
+# CSS tambahan buat mempercantik
+st.markdown("""
+    <style>
+    .main-title {
+        font-size: 36px;
+        color: #2C3E50;
+        text-align: center;
+        padding: 20px 0;
+    }
+    .stButton>button {
+        background-color: #2C3E50;
+        color: white;
+    }
+    body {
+        background-color: #f5f9ff;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-# 📑 MENU 1: BERANDA UTAMA
-if menu_pilihan == "🏠 Beranda Utama":
-    
-    # 1. Tampilkan animasi Lottie di bagian paling atas
-    if lottie_home:
-        st_lottie(lottie_home, speed=1, loop=True, quality="high", height=200)
-    
-    st.markdown("<br>", unsafe_allow_html=True) # Memberi sedikit jarak vertikal
-    
-    # 2. Judul dengan Background CSS kustom
-    st.markdown(
-        """
-        <div style="
-            background-color: #1e4620; 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin-bottom: 25px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-        ">
-            <h1 style="color: white; margin: 0; font-size: 28px; text-align: center;">
-                🌿 Selamat Datang di Sistem Pemantauan Limbah B3
-            </h1>
-        </div>
-        """, 
-        unsafe_allow_html=True
-    )
-    
-    # 3. Tampilkan teks penjelasan di bawahnya
+# BERANDA
+if menu == "🏠 Beranda":
+    if lottie_beranda:
+        st_lottie(lottie_beranda, speed=1, quality="high", height=350, key="beranda_anim")
     st.markdown("""
-    ### Kenapa Aplikasi Ini Dibuat?
-    Pengelolaan Limbah Bahan Berbahaya dan Beracun (B3) merupakan salah satu aspek paling krusial sekaligus sensitif dalam operasional industri modern.
-    
-    Aplikasi ini dikembangkan sebagai solusi digital berbasis data untuk:
-    * **Mencegah Pelanggaran Hukum:** Memberikan sistem peringatan dini sebelum masa simpan legal limbah di Tempat Penyimpanan Sementara (TPS) berakhir.
-    * **Standardisasi Pengemasan:** Menyediakan rekomendasi wadah penyimpanan yang tepat secara otomatis demi keselamatan kerja.
-    * **Transparansi Audit:** Mempermudah pencatatan logbook yang rapi, terstruktur, dan siap pakai untuk keperluan audit lingkungan internal maupun eksternal.
+        <style>
+        .hero {
+            background: linear-gradient(135deg, #d4edda, green);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        </style>
+        <div class='hero'>
+            <h1>♻️ Manajemen & Edukasi Limbah Industri ♻️</h1>
+            <p>Belajar dan menghitung bagaimana pengolahan limbah industri secara baku mutu.</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if lottie_edukasi:
+            st_lottie(lottie_edukasi, speed=1, quality="high", height=150, key="edu_anim")
+        st.markdown("### Edukasi Proses")
+        st.write("Kenali tahapan proses pemisahan pengolahan limbah dari awal.")
+    with col2:
+        if lottie_laboratorium:
+            st_lottie(lottie_laboratorium, speed=1, quality="high", height=150, key="lab_anim_home")
+        st.markdown("### Uji Laboratorium")
+        st.write("Hitung nilai COD, BOD, TSS, dan pH dari data sampel.")
+    with col3:
+        if lottie_interaktif:
+            st_lottie(lottie_interaktif, speed=1, quality="high", height=150, key="interaktif_anim")
+        st.markdown("### Perhitungan Simulasi")
+        st.write("Lakukan perhitungan kadar limbah yang bisa dibuang sesuai baku mutu.")
+
+# PROSES
+elif menu == "⚙️ Proses":
+    if lottie_proses:
+        st_lottie(lottie_proses, speed=1, quality="high", height=200, key="proses_anim")
+    st.markdown('<div class="main-title">⚙️ Tahapan Pengolahan Limbah Industri</div>', unsafe_allow_html=True)
+    st.markdown("""
+    ### 🧹 1. Pra-Pengolahan (Pre-Treatment)
+    - **Screening:** Menyaring benda kasar seperti plastik dan kayu.
+    - **Grit Chamber:** Mengendapkan partikel berat seperti pasir.
+    - **Equalization Tank:** Menyeimbangkan aliran dan beban limbah.
+
+    ### 🧪 2. Pengolahan Primer
+    - **Primary Clarifier:** Mengendapkan padatan tersuspensi.
+
+    ### 🧬 3. Pengolahan Sekunder (Biologis)
+    - **Aerob:** Dengan oksigen (activated sludge, trickling filter).
+    - **Anaerob:** Tanpa oksigen untuk limbah berat.
+
+    ### 🧼 4. Pengolahan Tersier
+    - **Filtrasi, Reverse Osmosis, Proses Kimia.**
+
+    ### 🧱 5. Pengolahan Lumpur
+    - **Thickening, Digestion, Dewatering.**
+
+    ### 🌊 6. Pembuangan Akhir
+    - **Limbah cair buangan yang memenuhi standar.**
+    """)
+
+# UJI LAB
+elif menu == "🧪 Uji Lab":
+    if lottie_lab:
+        st_lottie(lottie_lab, speed=1, quality="high", height=200, key="lab_calc_anim")
+    st.markdown('<div class="main-title">🧪 Kalkulator Uji Laboratorium</div>', unsafe_allow_html=True)
+    uji = st.selectbox("Pilih jenis uji:", ["COD", "BOD", "TSS", "pH"])
+
+    if uji == "COD":
+        st.markdown("### Rumus Umum COD:")
+        st.latex(r'''\text{COD (mg/L)} = \frac{(V_b - V_s) \times N \times 8000}{V_{\text{sampel}}}''')
+
+        st.markdown("""
+            **Keterangan:** - $V_b$ : Volume titran untuk blanko (mL)  
+            - $V_s$ : Volume titran untuk sampel (mL)  
+            - $N$ : Normalitas (N)  
+            - $V_{\text{sampel}}$ : Volume sampel (mL)  
+            """)
+        
+        # Perbaikan Input Variabel agar sinkron dengan rumus asli
+        vb = st.number_input("Volume titran Blanko / Vb (mL)", value=12.0)
+        vs_titran = st.number_input("Volume titran Sampel / Vs (mL)", value=10.0)
+        n = st.number_input("Normalitas FAS / N (N)", value=0.1)
+        v_sampel = st.number_input("Volume sampel / Vsampel (mL)", value=50.0)
+        
+        if st.button("Hitung COD"):
+            if vb >= vs_titran:
+                hasil = ((vb - vs_titran) * n * 8000) / v_sampel
+                st.success(f"COD = {hasil:.2f} mg/L")
+
+                fig = go.Figure(data=[go.Pie(
+                    labels=["COD", "Sisa Kapasitas Oksigen"],
+                    values=[hasil, max(500 - hasil, 0)],
+                    hole=0.5,
+                    marker_colors=["#2C3E50", "#95a5a6"]
+                )])
+                fig.update_layout(width=400, height=300)
+                st.plotly_chart(fig)
+
+                buffer = io.StringIO()
+                buffer.write(f"Hasil Uji COD\nVol Blanko: {vb} mL\nVol Sampel Titran: {vs_titran} mL\nNormalitas: {n} N\nVol Sampel Air: {v_sampel} mL\n=> COD = {hasil:.2f} mg/L")
+                st.download_button("📄 Unduh Hasil", buffer.getvalue(), file_name="hasil_uji_cod.txt")
+            else:
+                st.error("Volume Blanko (Vb) harus lebih besar atau sama dengan Volume Sampel (Vs)!")
+
+    elif uji == "BOD":
+        st.markdown("### Rumus Umum BOD:")
+        st.latex(r'''\text{BOD (mg/L)} = D_1 - D_2''')
+
+        st.markdown("""
+            **Keterangan:** - $D_1$ : Konsentrasi DO awal (sebelum inkubasi)  
+            - $D_2$ : Konsentrasi DO akhir (setelah inkubasi 5 hari)  
+            """)
+        
+        awal = st.number_input("DO Awal (mg/L)", value=8.0)
+        akhir = st.number_input("DO Akhir (mg/L)", value=2.0)
+        if st.button("Hitung BOD"):
+            hasil = awal - akhir
+            st.success(f"BOD = {hasil:.2f} mg/L")
+
+            fig = go.Figure(data=[go.Pie(
+                labels=["Terpakai (BOD)", "Tersisa (Oksigen)"],
+                values=[hasil, akhir],
+                hole=0.5,
+                marker_colors=["#3498db", "#ecf0f1"]
+            )])
+            fig.update_layout(width=400, height=300)
+            st.plotly_chart(fig)
+
+            buffer = io.StringIO()
+            buffer.write(f"Hasil Uji BOD\nDO Awal: {awal} mg/L\nDO Akhir: {akhir} mg/L\n=> BOD = {hasil:.2f} mg/L")
+            st.download_button("📄 Unduh Hasil", buffer.getvalue(), file_name="hasil_uji_bod.txt")
+
+    elif uji == "TSS":
+        st.markdown("### Rumus TSS:")
+        st.latex(r'''\text{TSS (mg/L)} = \frac{(W_2 - W_1) \times 1000}{V}''')
+
+        st.markdown("""
+            **Keterangan:** - $W_1$ : Berat kertas saring kosong (mg)  
+            - $W_2$ : Berat kertas saring + padatan kering (mg)  
+            - $V$ : Volume sampel air (L)  
+            """)
+        awal = st.number_input("Berat filter awal (mg)", value=100.0)
+        akhir = st.number_input("Berat filter akhir (mg)", value=120.0)
+        volume = st.number_input("Volume sampel (L)", value=1.0)
+        if st.button("Hitung TSS"):
+            hasil = (akhir - awal) / volume
+            st.success(f"TSS = {hasil:.2f} mg/L")
+
+            fig = go.Figure(data=[go.Pie(
+                labels=["Padatan Tersuspensi", "Lainnya"],
+                values=[hasil, max(100 - hasil, 0)],
+                hole=0.5,
+                marker_colors=["#9b59b6", "#dcdde1"]
+            )])
+            fig.update_layout(width=400, height=300)
+            st.plotly_chart(fig)
+
+            buffer = io.StringIO()
+            buffer.write(f"Hasil Uji TSS\nBerat awal: {awal} mg\nBerat akhir: {akhir} mg\nVolume: {volume} L\n=> TSS = {hasil:.2f} mg/L")
+            st.download_button("📄 Unduh Hasil", buffer.getvalue(), file_name="hasil_uji_tss.txt")
+
+    elif uji == "pH":
+        ph = st.slider("pH sampel", 0.0, 14.0, 7.0)
+        st.info(f"pH = {ph}")
+        warna = "#2ecc71" if 6.0 <= ph <= 9.0 else "#e74c3c" # Menyesuaikan rentang standar air limbah
+        fig = go.Figure(data=[go.Pie(
+            labels=["pH", "Skala Tersisa"],
+            values=[ph, 14 - ph],
+            hole=0.5,
+            marker_colors=[warna, "#ecf0f1"]
+        )])
+        fig.update_layout(width=400, height=300)
+        st.plotly_chart(fig)
+
+# SIMULASI KONSENTRASI
+elif menu == "🧩 Konsentrasi":
+    if lottie_simulasi:
+        st_lottie(lottie_simulasi, speed=1, quality="high", height=200, key="sim_kons_anim")
+    st.markdown('<div class="main-title">🧩 Perhitungan Konsentrasi Limbah</div>', unsafe_allow_html=True)
+
+    st.markdown("### Rumus Pengurangan Konsentrasi Limbah:")
+    st.latex(r'''C_{\text{akhir}} = C_{\text{awal}} \times (1 - \text{efisiensi})''')
+    st.markdown("""
+    **Keterangan:** - $C_{\text{awal}}$ : Konsentrasi awal limbah (mg/L)  
+    - $\text{efisiensi}$ : Efisiensi pengolahan limbah (%)  
+    - $C_{\text{akhir}}$ : Konsentrasi limbah setelah pengolahan (mg/L)  
     """)
     
-# 📑 MENU 2: INPUT & HASIL DATA
-elif menu_pilihan == "📥 Input & Hasil Data":
-    
-    # 1. Tampilkan animasi Lottie di bagian paling atas halaman menu 2
-    if lottie_form:
-        st_lottie(lottie_form, speed=1, loop=True, quality="high", height=180, key="form_menu_top")
-    
-    st.markdown("<br>", unsafe_allow_html=True) # Jarak vertikal halus
-    
-    # 2. Judul Halaman dengan Background Kustom yang Menarik
-    st.markdown(
-        """
-        <div style="
-            background-color: #2c3e50; 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin-bottom: 30px;
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
-        ">
-            <h2 style="color: white; margin: 0; font-size: 26px; text-align: center; font-family: 'Source Sans Pro', sans-serif;">
-                📥 Manajemen Inventaris & Logbook Digital TPS B3
-            </h2>
-        </div>
-        """, 
-        unsafe_allow_html=True
-    )
-    
-    # 3. Pembagian Kolom untuk Form dan Tabel di bawah Judul Utama
-    col_f1, col_f2 = st.columns([1, 2])
-    
-    # Sisi Kiri: Form Input
-    with col_f1:
-        st.subheader("📝 Entri Limbah Masuk")
-            
-        with st.form(key="form_b3", clear_on_submit=True):
-            jenis_limbah = st.selectbox("Pilih Jenis Limbah B3", list(B3_DATABASE.keys()))
-            
-            simbol_oto = B3_DATABASE[jenis_limbah]["simbol"]
-            wadah_oto = B3_DATABASE[jenis_limbah]["wadah_rekomendasi"]
-            
-            # Info box otomatis yang rapi di dalam form
-            st.info(f"**Karakteristik:** {simbol_oto}\n\n**Rekomendasi Wadah:** {wadah_oto}")
-            
-            berat = st.number_input("Berat Limbah (Kg)", min_value=1.0, step=10.0)
-            tgl_masuk = st.date_input("Tanggal Masuk TPS", date.today())
-            
-            submit_btn = st.form_submit_button(label="Simpan ke Logbook")
-            
-        if submit_btn:
-            id_limbah = f"B3-{datetime.now().strftime('%M%S')}"
-            batas_hari = B3_DATABASE[jenis_limbah]["masa_simpan"]
-            sisa_hari = batas_hari - (date.today() - tgl_masuk).days
-            
-            status = "Aman"
-            if sisa_hari <= 14:
-                status = "KRITIS 🔴"
-            elif sisa_hari <= 30:
-                status = "Peringatan 🟡"
+    jenis = st.selectbox("Jenis limbah", ["Kimia", "Organik", "Campuran"])
+    awal = st.number_input("Konsentrasi awal (mg/L)", value=500.0)
 
-            new_data = pd.DataFrame([{
-                "ID Limbah": id_limbah,
-                "Jenis Limbah": jenis_limbah,
-                "Karakteristik / Simbol": simbol_oto,
-                "Rekomendasi Wadah": wadah_oto,
-                "Berat (Kg)": berat,
-                "Tanggal Masuk": tgl_masuk,
-                "Batas Hari": f"{batas_hari} Hari",
-                "Sisa Hari": sisa_hari,
-                "Status": status
-            }])
-            
-            st.session_state.b3_db = pd.concat([st.session_state.b3_db, new_data], ignore_index=True)
-            st.success("Data Berhasil Disimpan ke TPS!")
-            st.rerun()
-
-    # Sisi Kanan: Hasil Tabel & Tombol Download
-    with col_f2:
-        st.subheader("📊 Tabel Pantauan Real-Time TPS")
-        
-        if st.session_state.b3_db.empty:
-            st.info("Belum ada data masuk. Silakan isi form entri di sebelah kiri.")
-        else:
-            # Fungsi pewarnaan status tabel
-            def color_status(val):
-                if "KRITIS" in str(val):
-                    return "background-color: #ffcccc; color: black; font-weight: bold;"
-                elif "Peringatan" in str(val):
-                    return "background-color: #fff2cc; color: black;"
-                return "background-color: #e2f0d9; color: black;"
-
-            df_styled = st.session_state.b3_db.style.applymap(color_status, subset=["Status"])
-            st.dataframe(df_styled, use_container_width=True)
-            
-            # FITUR DOWNLOAD DATA
-            st.markdown("---")
-            st.markdown("### 📥 Ekspor Laporan Resmi")
-            csv_data = st.session_state.b3_db.to_csv(index=False).encode('utf-8')
-            
-            st.download_button(
-                label="📥 Unduh Data Logbook (.CSV)",
-                data=csv_data,
-                file_name=f"Logbook_Limbah_B3_{date.today()}.csv",
-                mime="text/csv",
-                use_container_width=True
-            )
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("Kosongkan Semua Data TPS", use_container_width=True):
-                st.session_state.b3_db = pd.DataFrame(columns=[
-                    "ID Limbah", "Jenis Limbah", "Karakteristik / Simbol", 
-                    "Rekomendasi Wadah", "Berat (Kg)", "Tanggal Masuk", "Batas Hari", "Sisa Hari", "Status"
-                ])
-                st.rerun()
-
-# 📑 MENU 3: TENTANG & REGULASI
-elif menu_pilihan == "ℹ️ Tentang & Regulasi":
+    # PERBAIKAN: Nilai efisiensi disesuaikan tepat dengan catatan kaki (Kimia 80%, Organik 70%, Campuran 60%)
+    efisiensi = {"Kimia": 0.80, "Organik": 0.70, "Campuran": 0.60}[jenis]
     
-    # 1. Tampilkan animasi Lottie di bagian paling atas
-    if lottie_about:
-        st_lottie(lottie_about, speed=1, loop=True, quality="high", height=180, key="about_menu_top")
-        
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # 2. Judul Halaman dengan Background Kustom 
-    st.markdown(
-        """
-        <div style="
-            background-color: #7f8c8d; 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin-bottom: 30px;
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
-        ">
-            <h2 style="color: white; margin: 0; font-size: 26px; text-align: center;">
-                ℹ️ Informasi Pengembang & Acuan Regulasi
-            </h2>
-        </div>
-        """, 
-        unsafe_allow_html=True
-    )
-    
-    # 3. Pembagian Konten (Kiri: Kelompok & Regulasi, Kanan: Info Tambahan)
-    col_a1, col_a2 = st.columns([2, 1])
-    
-    with col_a1:
-        # ---- SEKSI TIM / KELOMPOK ----
-        st.subheader("👥 Tim Pengembang (Kelompok)")
-        
-        # Contoh susunan 3 anggota kelompok berdampingan menggunakan kolom
-        col_m1, col_m2, col_m3 = st.columns(3)
-        
-        with col_m1:
-            st.markdown("""
-            <div style="background-color: #f8f9fa; padding: 15px; border-left: 5px solid #1e4620; border-radius: 4px;">
-                <strong>Nama Anggota 1</strong><br>
-                <span style="color: gray; font-size: 14px;">NIM. 123456789</span><br>
-                <small>Perancang Sistem</small>
-            </div>
-            """, unsafe_allow_html=True)
-            
-        with col_m2:
-            st.markdown("""
-            <div style="background-color: #f8f9fa; padding: 15px; border-left: 5px solid #2c3e50; border-radius: 4px;">
-                <strong>Nama Anggota 2</strong><br>
-                <span style="color: gray; font-size: 14px;">NIM. 987654321</span><br>
-                <small>Programmer Python</small>
-            </div>
-            """, unsafe_allow_html=True)
-            
-        with col_m3:
-            st.markdown("""
-            <div style="background-color: #f8f9fa; padding: 15px; border-left: 5px solid #7f8c8d; border-radius: 4px;">
-                <strong>Nama Anggota 3</strong><br>
-                <span style="color: gray; font-size: 14px;">NIM. 564738291</span><br>
-                <small>Analis Regulasi</small>
-            </div>
-            """, unsafe_allow_html=True)
-            
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        # ---- SEKSI REGULASI ----
-        st.subheader("📚 Acuan Baku Mutu & Regulasi")
-        st.markdown("""
-        Sistem klasifikasi otomatis piktogram bahaya, rekomendasi wadah, serta ambang batas masa simpan dalam aplikasi ini dirancang berdasarkan hukum positif Indonesia:
-        1. **Peraturan Pemerintah (PP) No. 22 Tahun 2021** tentang *Penyelenggaraan Perlindungan dan Pengelolaan Lingkungan Hidup* (Lampiran IX khusus Pengelolaan Limbah B3).
-        2. **Peraturan Menteri LHK No. 6 Tahun 2021** tentang *Tata Cara dan Persyaratan Pengelolaan Limbah Bahan Berbahaya dan Beracun*.
-        3. **Sistem Harmonisasi Global (GHS - Globally Harmonized System)** untuk standardisasi piktogram bahaya internasional.
-        """)
+    if st.button("Mulai Simulasi"):
+        akhir = awal * (1 - efisiensi)
+        st.success(f"Hasil akhir setelah pengolahan: {akhir:.2f} mg/L ({efisiensi*100:.0f}% efisiensi)")
 
-    with col_a2:
-        st.subheader("💻 Detail Aplikasi")
-        st.info("""
-        * **Nama Aplikasi:** B3 Waste Tracker Pro
-        * **Versi:** 1.2 (Dashboard Update)
-        * **Framework:** Streamlit Python
-        * **Tujuan Proyek:** Tugas Besar / Proyek Digitalisasi Pengelolaan Limbah Industri di TPS.
-        """)
+        fig = go.Figure(data=[go.Pie(
+            labels=["Terolah (Efisiensi)", "Sisa Emisi"],
+            values=[awal - akhir, akhir],
+            hole=0.5,
+            marker_colors=["#27ae60", "#e74c3c"]
+        )])
+        fig.update_layout(width=400, height=300)
+        st.plotly_chart(fig)
+
+        buffer = io.StringIO()
+        buffer.write(f"Simulasi Pengolahan Limbah\nJenis: {jenis}\nKonsentrasi awal: {awal} mg/L\nEfisiensi: {efisiensi*100:.0f}%\n=> Hasil akhir: {akhir:.2f} mg/L")
+        st.download_button("📄 Unduh Hasil", buffer.getvalue(), file_name="hasil_simulasi.txt")
+        
+    st.markdown("---")
+    st.caption("ℹ️ *Catatan: Nilai efisiensi simulasi (Kimia 80%, Organik 70%, dan Campuran 60%) disesuaikan dengan standar baku mutu PERMENLHK No. 5 Tahun 2014.*")
+        
+# TENTANG
+elif menu == "ℹ️ Tentang":
+    if lottie_tentang:
+        st_lottie(lottie_tentang, speed=1, quality="high", height=150, key="about_page_anim")
+    st.markdown('<div class="main-title">ℹ️ Tentang Aplikasi Ini</div>', unsafe_allow_html=True)
+    st.write("""
+    **Limbah Track** adalah aplikasi edukatif interaktif yang dirancang untuk membantu pengguna memahami proses dan perhitungan pengolahan limbah industri cair.
+
+    Aplikasi ini menampilkan simulasi pengolahan, uji laboratorium, serta perhitungan parameter kualitas air limbah seperti:
+    
+    - **COD** (Chemical Oxygen Demand)
+    - **BOD** (Biochemical Oxygen Demand)
+    - **TSS** (Total Suspended Solid)
+    - **pH** (derajat keasaman)
+
+    ### 🎯 Tujuan:
+    Membantu memahami batas baku mutu dan pentingnya pengolahan limbah cair industri agar tidak mencemari lingkungan.
+
+    ### 📚 Referensi:
+    - Modul Teknik Lingkungan
+    - Litbang KLHK
+    - **PERMENLHK No. 5 Tahun 2014** tentang Baku Mutu Air Limbah
+
+    ### 👨‍💻 Teknologi:
+    - Python + Streamlit
+    - Visualisasi interaktif (Plotly, Lottie)
+
+    ### 👥 Pengembang:
+    - Kelompok 6 – 1F PLI AKA
+    - Versi: 1.1 (2026)
+    """)
