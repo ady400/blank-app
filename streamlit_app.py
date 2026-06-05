@@ -105,11 +105,11 @@ elif menu == "🧮 Kalkulator COD":
         ''')
         st.markdown("""
         **Keterangan:**
-        *   **A**: Volume penitar (FAS) untuk blanko (mL)
-        *   **B**: Volume penitar (FAS) untuk sampel (mL)
-        *   **N**: Normalitas larutan FAS (N)
-        *   **8000**: Berat setara oksigen (mg/ekivalen)
-        *   **V**: Volume sampel air yang diuji (mL)
+        * **A**: Volume penitar (FAS) untuk blanko (mL)
+        * **B**: Volume penitar (FAS) untuk sampel (mL)
+        * **N**: Normalitas larutan FAS (N)
+        * **8000**: Berat setara oksigen (mg/ekivalen)
+        * **V**: Volume sampel air yang diuji (mL)
         """)
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -122,8 +122,8 @@ elif menu == "🧮 Kalkulator COD":
         st.subheader("📥 Data Hasil Uji")
         v_blanko = st.number_input("Volume Penitar Blanko (A)", min_value=0.0, value=10.0, step=0.1)
         v_sampel = st.number_input("Volume Penitar Sampel (B)", min_value=0.0, value=6.5, step=0.1)
-        norm = st.number_input("Normalitas Penitar (N)", min_value=0.0, value=0.1, format="%.4f")
-        v_air = st.number_input("Volume Sampel Air (mL)", min_value=1.0, value=25.0)
+        norm = st.number_input("Normalitas Penitar (N)", min_value=0.0000, value=0.1000, format="%.4f", step=0.001)
+        v_air = st.number_input("Volume Sampel Air (mL)", min_value=1.0, value=25.0, step=1.0)
         
     with col_b:
         st.subheader("📋 Pilih Standar")
@@ -153,10 +153,10 @@ elif menu == "🧮 Kalkulator COD":
         st.markdown(f"### Hasil Perhitungan: `{hasil:.2f} mg/L`")
         
         if hasil <= limit:
-            st.success(f"✅ **LOLOS.** Kadar COD ({hasil:.2f}) memenuhi standar baku mutu ({limit}).")
+            st.success(f"✅ **LOLOS.** Kadar COD ({hasil:.2f} mg/L) memenuhi standar baku mutu ({limit} mg/L).")
             st.balloons()
         else:
-            st.error(f"❌ **TIDAK LOLOS.** Kadar COD ({hasil:.2f}) melebihi batas aman ({limit}).")
+            st.error(f"❌ **TIDAK LOLOS.** Kadar COD ({hasil:.2f} mg/L) melebihi batas aman ({limit} mg/L).")
 
 # ==========================================
 # HALAMAN 3: TENTANG APLIKASI
@@ -178,7 +178,7 @@ elif menu == "ℹ️ Tentang & Referensi":
             <ul>
                 <li><b>Nama:</b> Raehan Ady Saesya</li>
                 <li><b>Role:</b> Developer & Environmental Analyst</li>
-                <li><b>Tujuan:</b> Alat bantu praktikum & monitoring IPAL.</li>
+                <li><b>Tujuan:</b> Alat bantu praktikum & monitoring IPAL</li>
             </ul>
         </div>
         """, unsafe_allow_html=True)
@@ -187,4 +187,13 @@ elif menu == "ℹ️ Tentang & Referensi":
         st.markdown("""
         <div class="custom-card">
             <h3>📚 Referensi Utama</h3>
-            <p>Metode perhitungan dan data baku
+            <p>Metode perhitungan dan data baku mutu didasarkan pada:</p>
+            <ol>
+                <li><b>SNI 6989.2:2019</b> (Cara Uji COD)</li>
+                <li><b>Permen LHK No. 68/2016</b></li>
+                <li><b>PP No. 22 Tahun 2021</b></li>
+            </ol>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    st.info("Aplikasi ini sukses berjalan menggunakan Python dan Streamlit Framework.")
