@@ -68,7 +68,7 @@ if menu == "🏠 Home":
     st.title("🌱 EcoWater COD Analyzer")
     st.subheader("Solusi Digital Pemantauan Kualitas Air Limbah")
     
-    st.image("https://images.unsplash.com/photo-1532601224476-15c79f2f7a51?auto=format&fit=crop&w=800&q=80", caption="Komitmen menjaga kelestarian lingkungan melalui monitoring air limbah.", use_container_width=True)
+    st.image("https://images.unsplash.com/photo-1532601224476-15c79f2f7a51?auto=format&fit=crop&w=800&q=80", caption="Komitmen menjaga kelestarian lingkungan melalui monitoring air limbah.", use_column_width="always")
     
     st.markdown("""
     ### 📌 Tentang Web Ini
