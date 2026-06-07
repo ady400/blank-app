@@ -98,18 +98,20 @@ elif menu == "🧮 Kalkulator COD":
              caption="Proses Titrasi Laboratorium untuk Penentuan Kadar COD.", use_column_width="always")
 
     # Bagian Rumus Perhitungan
-    with st.expander("📝 Lihat Rumus Perhitungan (Metode Titrimetri)", expanded=True):
-        st.markdown('<div class="formula-box">', unsafe_allow_html=True)
-        st.latex(r'''
-            COD (mg/L) = \frac{(A - B) \times N \times 8000}{V_{sampel}}
-        ''')
+    # Pastikan menggunakan struktur 'with st.expander' seperti ini:
+    with st.expander("📝 Lihat Rumus Perhitungan (Metode Titrimetri)"):
+        
+        # 1. Tampilkan rumus utama (Gunakan objek st.latex agar rapi di tengah)
+        st.latex(r"COD (mg/L) = \frac{(A - B) \times N \times 8000}{V_{sampel}}")
+        
+        # 2. Tampilkan keterangan komponen rumus
         st.markdown("""
         **Keterangan:**
-        * **A**: Volume penitar (FAS) untuk blanko (mL)
-        * **B**: Volume penitar (FAS) untuk sampel (mL)
-        * **N**: Normalitas larutan FAS (N)
-        * **8000**: Berat setara oksigen (mg/ekivalen)
-        * **V**: Volume sampel air yang diuji (mL)
+        * **A:** Volume penitar (FAS) untuk blanko (mL)
+        * **B:** Volume penitar (FAS) untuk sampel (mL)
+        * **N:** Normalitas larutan FAS (N)
+        * **8000:** Berat setara oksigen (mg/ekivalen)
+        * **V:** Volume sampel air yang diuji (mL)
         """)
         st.markdown('</div>', unsafe_allow_html=True)
 
