@@ -106,7 +106,7 @@ st.markdown("""
 # ==========================================
 with st.sidebar:
     st.image("https://i.pinimg.com/736x/a0/92/58/a09258df83907bc5d1f8f506a037cd76.jpg", width=100)
-    st.title("Eco Water")
+    st.title("EcoWater")
     menu = st.radio(
         "Navigasi Halaman:",
         ["🏠 Beranda", "🧮 Kalkulator COD", "ℹ️ Tentang & Referensi"],
