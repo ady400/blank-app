@@ -166,7 +166,7 @@ if menu == "🏠 Beranda":
 # HALAMAN 2: KALKULATOR COD
 # ==========================================
 elif menu == "🧮 Kalkulator COD":
-    st.title("🧮 Kalkulator Kadar COD")
+    st.title("Kalkulator Kadar COD")
     
     # Foto Halaman Kalkulator
     st.image("https://i.pinimg.com/736x/2d/f4/4c/2df44ccf0de9728ae2ba1f623cf3a937.jpg", 
@@ -239,7 +239,7 @@ elif menu == "🧮 Kalkulator COD":
 # HALAMAN 3: TENTANG APLIKASI
 # ==========================================
 elif menu == "ℹ️ Tentang & Referensi":
-    st.title("ℹ️ Tentang Aplikasi")
+    st.title("Tentang Aplikasi")
     
     # Foto Halaman Tentang
     st.image("https://i.pinimg.com/1200x/80/e5/df/80e5df94c2c611c566909ad629a86cd8.jpg", 
