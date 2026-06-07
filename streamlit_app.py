@@ -126,7 +126,7 @@ if menu == "🏠 Beranda":
     
     st.markdown("""
     <div class="custom-card">
-        <h3>Selamat Datang!</h3>
+        <h3>Selamat Datang</h3>
         <p><b>EcoWater COD Analyzer</b> adalah aplikasi berbasis web yang dirancang untuk membantu profesional lingkungan 
         menghitung kadar <i>Chemical Oxygen Demand</i> (COD) secara instan dan akurat.</p>
         <p>Aplikasi ini mengintegrasikan data laboratorium dengan standar regulasi pemerintah untuk memberikan analisis cepat 
