@@ -13,7 +13,7 @@ st.set_page_config(
 st.markdown("""
     <style>
     .stApp {
-        background-color: #0d9488;
+        background-color: #10b981; /* <-- Ini yang bikin seluruh layar jadi hijau */
     }
     section[data-testid="stSidebar"] {
         background-color: #f0fdf4 !important;
