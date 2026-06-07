@@ -82,7 +82,7 @@ with st.sidebar:
 # HALAMAN 1: HOME (BERANDA)
 # ==========================================
 if menu == "🏠 Beranda":
-    st.title("🌱 EcoWater COD Analyzer")
+    st.markdown("<h1 style='text-align: center; color: #047857; font-weight: 800; margin-bottom: 20px;'>🌱 EcoWater COD Analyzer</h1>", unsafe_allow_html=True)
     
     # Foto Halaman Beranda
     st.image("https://i.pinimg.com/1200x/48/81/54/4881545ab4580b32e5bb0ce8679b8598.jpg", 
