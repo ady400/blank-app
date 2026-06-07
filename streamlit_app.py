@@ -53,7 +53,7 @@ st.markdown("""
 # SIDEBAR NAVIGATION
 # ==========================================
 with st.sidebar:
-    st.image("https://img.icons8.com/color/96/ecology-green-energy.png", width=80)
+    st.image("https://i.pinimg.com/736x/a0/92/58/a09258df83907bc5d1f8f506a037cd76.jpg", width=80)
     st.title("Menu Utama")
     menu = st.radio(
         "Navigasi Halaman:",
@@ -69,7 +69,7 @@ if menu == "🏠 Beranda":
     st.title("🌱 EcoWater COD Analyzer")
     
     # Foto Halaman Beranda
-    st.image("https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=1000&q=80", 
+    st.image("https://i.pinimg.com/1200x/48/81/54/4881545ab4580b32e5bb0ce8679b8598.jpg", 
              caption="Melindungi sumber daya air untuk masa depan hijau.", use_column_width="always")
     
     st.markdown("""
@@ -94,7 +94,7 @@ elif menu == "🧮 Kalkulator COD":
     st.title("🧮 Kalkulator Kadar COD")
     
     # Foto Halaman Kalkulator
-    st.image("https://images.unsplash.com/photo-1581093588401-fbb62a02f120?auto=format&fit=crop&w=1000&q=80", 
+    st.image("https://i.pinimg.com/736x/2d/f4/4c/2df44ccf0de9728ae2ba1f623cf3a937.jpg", 
              caption="Proses Titrasi Laboratorium untuk Penentuan Kadar COD.", use_column_width="always")
 
     # Bagian Rumus Perhitungan
@@ -167,7 +167,7 @@ elif menu == "ℹ️ Tentang & Referensi":
     st.title("ℹ️ Tentang Aplikasi")
     
     # Foto Halaman Tentang
-    st.image("https://images.unsplash.com/photo-1542601906-990-b4d3fb778b09?auto=format&fit=crop&w=1000&q=80", 
+    st.image("https://i.pinimg.com/1200x/80/e5/df/80e5df94c2c611c566909ad629a86cd8.jpg", 
              caption="Teknologi untuk Keberlanjutan Lingkungan.", use_column_width="always")
 
     col_dev, col_ref = st.columns(2)
