@@ -9,42 +9,58 @@ st.set_page_config(
     layout="centered",
 )
 
-# Custom CSS untuk UI Hijau yang Aesthetic
+# Custom CSS Global untuk mempercantik UI & komponen internal
 st.markdown("""
     <style>
     .stApp {
-        background-color: #f0f7f0;
+        background-color: #fdfdfd;
     }
-    h1, h2, h3 {
-        color: #1b5e20 !important;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    section[data-testid="stSidebar"] {
+        background-color: #f0fdf4 !important;
     }
-    .stButton>button {
-        background-color: #2e7d32;
+    section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] span, section[data-testid="stSidebar"] label {
+        color: #334155 !important;
+    }
+    div.stButton > button:first-child {
+        background-color: #10b981;
         color: white;
-        border-radius: 20px;
+        border-radius: 8px;
         border: none;
-        height: 3em;
-        width: 100%;
+        padding: 10px 24px;
+        font-weight: 600;
+        transition: all 0.3s ease;
     }
-    .stButton>button:hover {
-        background-color: #1b5e20;
-        color: #dcedc8;
+    div.stButton > button:first-child:hover {
+        background-color: #059669;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
     }
-    .custom-card {
-        background-color: #ffffff;
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        border-top: 5px solid #4caf50;
-        margin-bottom: 20px;
+    
+    /* 1. KODE UNTUK MEMBUAT FOTO OTOMATIS DI TENGAH DAN TIDAK ZOOM */
+    .stApp img {
+        max-width: 65% !important; /* Batasi lebar foto agar tidak terlalu besar */
+        height: auto !important;    /* Rasio foto tetap proporsional */
+        display: block !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        border-radius: 15px;       /* Sudut melengkung halus */
     }
-    .formula-box {
-        background-color: #e8f5e9;
-        padding: 15px;
-        border-radius: 10px;
-        border: 1px dashed #2e7d32;
-        margin: 10px 0;
+    
+    /* Khusus untuk logo kecil di dalam sidebar agar tidak ikut ke tengah */
+    section[data-testid="stSidebar"] img {
+        max-width: 100% !important;
+        display: inline-block !important;
+    }
+
+    /* 2. KODE BARU: MEMBUAT SEMUA JUDUL UTAMA DAN SUB-JUDUL DI TENGAH SECARA GLOBAL */
+    .stApp h1, .stApp h2, .stApp h3, .stApp p[style*="text-align: center"] {
+        text-align: center !important;
+    }
+    
+    /* Membuat blok text deskripsi bawaan menu ikut rapi di tengah */
+    div[data-testid="stMarkdownContainer"] > div[style*="max-width: 800px"] {
+        margin: 0 auto !important;
+        text-align: center !important;
     }
     </style>
 """, unsafe_allow_html=True)
