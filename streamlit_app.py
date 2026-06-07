@@ -174,7 +174,7 @@ elif menu == "🧮 Kalkulator COD":
 
     # Bagian Rumus Perhitungan
     # Pastikan menggunakan struktur 'with st.expander' seperti ini:
-    with st.expander("📝 Lihat Rumus Perhitungan (Metode Titrimetri)"):
+    with st.expander("Rumus Perhitungan (Metode Titrimetri)"):
         
         # 1. Tampilkan rumus utama (Gunakan objek st.latex agar rapi di tengah)
         st.latex(r"COD (mg/L) = \frac{(A - B) \times N \times 8000}{V_{sampel}}")
