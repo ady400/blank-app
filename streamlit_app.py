@@ -64,6 +64,42 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+st.markdown("""
+    <style>
+    /* 1. KODE UNTUK FOTO DI HALAMAN UTAMA (BERANDA) AGAR DI TENGAH */
+    [data-testid="stImage"] {
+        display: flex !important;
+        justify-content: center !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+    
+    [data-testid="stImage"] img {
+        display: block !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        border-radius: 12px; /* Membuat sudut foto melengkung rapi seperti di gambarmu */
+    }
+
+    /* 2. KODE KHUSUS UNTUK FOTO DI DALAM SIDEBAR (FOTO ERLENMEYER) */
+    section[data-testid="stSidebar"] [data-testid="stImage"] {
+        display: flex !important;
+        justify-content: center !important;
+    }
+    
+    section[data-testid="stSidebar"] [data-testid="stImage"] img {
+        max-width: 180px !important; /* Batasi ukuran foto di sidebar agar proporsional */
+        height: auto !important;
+    }
+
+    /* 3. KODE AGAR TABEL DATAFRAME JUGA IKUT DI TENGAH HALAMAN */
+    [data-testid="stDataFrame"] {
+        display: block !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # ==========================================
 # SIDEBAR NAVIGATION
