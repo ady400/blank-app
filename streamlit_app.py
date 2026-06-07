@@ -98,11 +98,34 @@ if menu == "🏠 Beranda":
     </div>
     """, unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Akurasi", "99.9%")
-    col2.metric("Kecepatan", "Instant")
-    col3.metric("Standar", "SNI/LHK")
+st.markdown("<br>", unsafe_allow_html=True)
 
+# Membuat 3 kolom untuk box HTML
+box_col1, box_col2, box_col3 = st.columns(3)
+
+with box_col1:
+    st.markdown("""
+        <div style="background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #10b981; text-align: center;">
+            <span style="font-size: 14px; color: #64748b; font-weight: 600; letter-spacing: 0.5px;">AKURASI ANALISIS</span><br>
+            <span style="font-size: 28px; font-weight: 800; color: #1e293b; display: block; margin-top: 5px;">99.9%</span>
+        </div>
+    """, unsafe_allow_html=True)
+
+with box_col2:
+    st.markdown("""
+        <div style="background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #3b82f6; text-align: center;">
+            <span style="font-size: 14px; color: #64748b; font-weight: 600; letter-spacing: 0.5px;">KECEPATAN RESPON</span><br>
+            <span style="font-size: 28px; font-weight: 800; color: #1e293b; display: block; margin-top: 5px;">Instant</span>
+        </div>
+    """, unsafe_allow_html=True)
+
+with box_col3:
+    st.markdown("""
+        <div style="background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #f59e0b; text-align: center;">
+            <span style="font-size: 14px; color: #64748b; font-weight: 600; letter-spacing: 0.5px;">STANDAR ACUAN</span><br>
+            <span style="font-size: 28px; font-weight: 800; color: #1e293b; display: block; margin-top: 5px;">SNI / LHK</span>
+        </div>
+    """, unsafe_allow_html=True)
 # ==========================================
 # HALAMAN 2: KALKULATOR COD
 # ==========================================
